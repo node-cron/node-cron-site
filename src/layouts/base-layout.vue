@@ -1,20 +1,16 @@
 <template>
     <div>
-        <menubar></menubar>
-        <container>
-            <slot></slot>
-        </container>
+        <topbar></topbar>
+        <slot></slot>
     </div>
 </template>
 
 <script>
-import Menubar from '../components/menubar.vue';
-import Container from '../components/container.vue';
+import Topbar from '../components/topbar.vue';
 
 export default {
     components: {
-        Menubar,
-        Container
+        Topbar
     }
 }
 </script>

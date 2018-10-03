@@ -2,9 +2,9 @@ import Vue from 'vue'
 import VueRouter from 'vue-router';
 import Home from './pages/home.vue'
 
-import css from './styles/base.scss';
-import favicon16 from './img/favicon-16x16.png';
-import favicon32 from './img/favicon-32x32.png';
+import './styles/base.scss';
+import './img/favicon-16x16.png';
+import './img/favicon-32x32.png';
 
 Vue.use(VueRouter)
 

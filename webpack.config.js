@@ -54,9 +54,6 @@ module.exports = {
   },
   plugins: [
     new VueLoaderPlugin(),
-    new HtmlWebpackPlugin({ template: './src/index.html' }),
-    new CopyWebpackPlugin([
-      { from: 'src/img/**/*', to: 'dist/img/', flatten: true }
-    ])
+    new HtmlWebpackPlugin({ template: './src/index.html' })
   ]
 }

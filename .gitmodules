@@ -1,0 +1,4 @@
+[submodule "dist"]
+	path = dist
+	url = git@github.com:node-cron/node-cron.github.io
+	branch = master

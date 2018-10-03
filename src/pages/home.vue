@@ -23,14 +23,14 @@ export default {
 
 <style lang="scss">
   .slogan {
-    height: 300px;
     text-align: center;
     background-color: #e6e6e6;
+    padding-top: 100px;
+    padding-bottom: 100px;
 
     h1 {
       color: green;
       font-size: 40px;
-      padding-top: 100px;
       font-weight: 100;
     }
 

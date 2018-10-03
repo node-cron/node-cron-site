@@ -34,10 +34,10 @@ cron.schedule('* * * * * *', function () {
                     'javascript'
                 );
 
-                demo.openApp('editor', {minHeight: '350px', windowTitle: 'demo.js'})
+                demo.openApp('editor', {minHeight: '350px', windowTitle: 'cron.js'})
                 .write(highlightedCode, {onCompleteDelay: 1500})
                 .openApp('terminal', {minHeight: '350px', promptString: '$'})
-                .command('node ./demo', {onCompleteDelay: 500})
+                .command('node ./cron.js', {onCompleteDelay: 500})
                 .respond('running a task every second!', {onCompleteDelay: 1000})
                 .respond('running a task every second!', {onCompleteDelay: 1000})
                 .respond('running a task every second!', {onCompleteDelay: 1000})

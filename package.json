@@ -1,0 +1,40 @@
+{
+  "name": "node-cron-site",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "browser-sync start --server 'src' --files 'src' --single",
+    "dev": "webpack-dev-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/node-cron/node-cron.github.io.git"
+  },
+  "author": "Lucas Merencia <lucas@merencia.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/node-cron/node-cron.github.io/issues"
+  },
+  "homepage": "https://github.com/node-cron/node-cron.github.io#readme",
+  "devDependencies": {
+    "copy-webpack-plugin": "^4.5.2",
+    "css-loader": "^1.0.0",
+    "file-loader": "^2.0.0",
+    "html-webpack-plugin": "^3.2.0",
+    "node-sass": "^4.9.3",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.0",
+    "vue-loader": "^15.4.2",
+    "vue-style-loader": "^4.1.2",
+    "vue-template-compiler": "^2.5.17",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9"
+  },
+  "dependencies": {
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1"
+  }
+}

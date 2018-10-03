@@ -1,0 +1,24 @@
+.btn {
+    background-color: #cacaca;
+    line-height: 40px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 5px;
+    border: 1px solid #afafaf;
+    font-weight: 300;
+    font-size: 15px;
+    cursor: pointer;
+    outline: none;
+    &:active{
+        background-color: #c4c4c4;
+    }
+}
+
+.btn-primary {
+    background-color: #326f45;
+    border-color: #023b05;
+    color: #efefef;
+    &:active{
+        background-color: #005d2a;
+    }
+}

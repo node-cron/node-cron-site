@@ -19,13 +19,11 @@ export default {
 }
 </script>
 
-
 <style lang="scss">
     .menu {
         height: 80px;
         line-height: 80px;
         color: #6d6d6d;
-        margin-bottom: 30px;
         padding-top: 20px;
         padding-bottom: 20px;
 

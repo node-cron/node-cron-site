@@ -1,6 +1,5 @@
 <template>
     <div class="demo">
-        <h2>Demo</h2>
         <div class="demo-container">
         </div>
     </div>
@@ -55,6 +54,7 @@ cron.schedule('* * * * * *', function () {
     .demo {
         text-align: center;
         margin-top: 80px;
+        height: 400px;
 
         .demo-container {
             text-align: left;

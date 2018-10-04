@@ -4,12 +4,10 @@
         <div class="slogan">
           <container>
             <h1>A simple cron-like job scheduler for Node.js</h1>
-            <button class="btn btn-primary">Getting Started</button>
+            <demo></demo>
+            <button class="btn btn-primary btn-large">Getting Started</button>
           </container>
         </div>
-        <container>
-          <demo></demo>
-        </container>
       </div>
     </page-layout>
 </template>
@@ -34,6 +32,7 @@ export default {
     background-color: #e6e6e6;
     padding-top: 100px;
     padding-bottom: 100px;
+    height: 100%;
 
     h1 {
       color: green;

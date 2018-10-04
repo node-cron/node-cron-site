@@ -43,6 +43,8 @@ cron.schedule('* * * * * *', function () {
                 .respond('running a task every second!', {onCompleteDelay: 1000})
                 .respond('running a task every second!', {onCompleteDelay: 1000})
                 .respond('running a task every second!', {onCompleteDelay: 1000})
+                .respond('^C')
+                .command('')
                 .end();
             }
         }

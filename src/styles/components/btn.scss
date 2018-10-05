@@ -9,6 +9,8 @@
     font-size: 15px;
     cursor: pointer;
     outline: none;
+    display: inline-block;
+    text-decoration: none;
     &:active{
         background-color: #c4c4c4;
     }

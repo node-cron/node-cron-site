@@ -3,9 +3,27 @@ const path = require('path');
 
 const { VueLoaderPlugin } = require('vue-loader');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const PrerenderSPAPlugin = require('prerender-spa-plugin');
+const Renderer = PrerenderSPAPlugin.PuppeteerRenderer;
+
+let mode = process.env.NODE_ENV || 'development';
+
+let plugins = [
+  new VueLoaderPlugin(),
+  new HtmlWebpackPlugin({ template: './src/index.html', inject: false })
+];
+
+if(mode === 'production'){
+  plugins.push(new PrerenderSPAPlugin({
+    staticDir: `${__dirname}/dist`,
+    routes: ['/', '/docs'],
+    renderer: new Renderer()
+  }));
+}
+
 
 module.exports = {
-  mode: 'development',
+  mode: mode,
   entry: {
     app: "./src/main.js"
   },
@@ -57,8 +75,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new VueLoaderPlugin(),
-    new HtmlWebpackPlugin({ template: './src/index.html', inject: false })
-  ]
+  plugins: plugins
 }

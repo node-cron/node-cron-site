@@ -3,8 +3,6 @@ const path = require('path');
 
 const { VueLoaderPlugin } = require('vue-loader');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-
 
 module.exports = {
   mode: 'development',
@@ -61,6 +59,6 @@ module.exports = {
   },
   plugins: [
     new VueLoaderPlugin(),
-    new HtmlWebpackPlugin({ template: './src/index.html' })
+    new HtmlWebpackPlugin({ template: './src/index.html', inject: false })
   ]
 }

@@ -5,6 +5,9 @@
                     <img src="/img/logo.png"/>
                     <span class="name">node-cron</span>
                 </div>
+                <div>
+                    <router-link to="/docs">Docs</router-link>
+                </div>
              </container>
         </div>
 </template>

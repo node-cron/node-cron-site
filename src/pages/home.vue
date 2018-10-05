@@ -5,7 +5,7 @@
           <container>
             <h1>A simple cron-like job scheduler for Node.js</h1>
             <demo></demo>
-            <button class="btn btn-primary btn-large">Getting Started</button>
+            <router-link to="/docs" class="btn btn-primary btn-large">Getting Started</router-link>
           </container>
         </div>
       </div>
@@ -29,16 +29,7 @@ export default {
 <style lang="scss">
   .slogan {
     text-align: center;
-    background-color: #e6e6e6;
-    padding-top: 100px;
-    padding-bottom: 100px;
     height: 100%;
-
-    h1 {
-      color: green;
-      font-size: 40px;
-      font-weight: 100;
-    }
 
     button {
       margin-top: 30px;

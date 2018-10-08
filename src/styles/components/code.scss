@@ -21,5 +21,7 @@ code {
     width: 80%;
     pre{ 
         font-family: monospace;
+        word-wrap: break-word;
+        white-space: pre-wrap;
     }
 }

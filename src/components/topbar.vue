@@ -1,11 +1,13 @@
 <template>
         <div class="menu">
             <container>
-                <div>
-                    <router-link to="/">
-                        <img src="/img/logo.png"/>
-                        <span class="name">node-cron</span>
-                    </router-link>
+                <div class="menu-items">
+                    <div class="brand">
+                        <router-link to="/">
+                            <img src="/img/logo.png"/>
+                            <span class="name">node-cron</span>
+                        </router-link>
+                    </div>
                     <div class="links">
                         <router-link to="/docs">Docs</router-link>
                         <a href="https://github.com/node-cron/node-cron" target="_blank">Github</a>
@@ -27,44 +29,60 @@ export default {
 
 <style lang="scss">
     .menu {
-        height: 80px;
         line-height: 80px;
         color: #6d6d6d;
-        padding-top: 20px;
-        padding-bottom: 20px;
         background-color: #f1f1f1;
-
+        min-width: 300px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        
         a {
             text-decoration: none;
         }
 
-        .name {
-            font-size: 35px;
-            color: #6d6d6d;
-        }
-
-        img {
-            height: 80px;
-            display: inline-block;
-            vertical-align: top;
-        }
-
-        .links {
-            margin-top: 6px;
-            float: right;
-            a {
-                padding-top: 10px;
-                padding-bottom: 10px;
-                padding-left: 20px;
-                padding-right: 20px;
-                border-radius: 5px;
-                color: #6d6d6d;
-                text-decoration: none;
-                &:hover {
-                    background-color: #dfdfdf;
+        .menu-items {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            
+            .brand {
+                // width: 300px;
+                flex: 0 0 auto;
+                
+                .name {
+                    font-size: 35px;
+                    color: #6d6d6d;
                 }
-                &:active {
-                     background-color: #e1e1e1;
+
+
+                img {
+                    height: 80px;
+                    vertical-align: top;
+                }
+            }
+
+
+            .links {
+                margin-left: 20px;
+                flex: 1 1 auto;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+
+                a {
+                    line-height: 40px;
+                    height: 40px;
+                    padding-left: 20px;
+                    padding-right: 20px;
+                    border-radius: 5px;
+                    color: #6d6d6d;
+                    text-decoration: none;
+                    &:hover {
+                        background-color: #dfdfdf;
+                    }
+                    &:active {
+                        background-color: #e1e1e1;
+                    }
                 }
             }
         }

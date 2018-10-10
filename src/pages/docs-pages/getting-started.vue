@@ -17,8 +17,5 @@ cron.schedule('* * * * *', () => {
                 </code>
             </pre>  
         </p>
-        <p>
-            See the <router-link to="/docs#cron-syntax">cron syntax</router-link> tho create diferent expressions for jobs scheduling.
-        </p>
     </div>
 </template>

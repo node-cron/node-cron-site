@@ -7,6 +7,16 @@ if [ ! -z "$CHANGED" ]; then
     exit 1;
 fi
 
-# NODE_ENV=production npm run build
+NODE_ENV=production npm run build
 
-echo $CHANGED
+cd dist
+git add --all
+git commit -m "new release"
+git push origin master
+
+cd ..
+git add --all
+git commit -m "new release"
+git push origin HEAD
+
+echo "deployed!"

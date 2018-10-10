@@ -10,7 +10,10 @@ let mode = process.env.NODE_ENV || 'development';
 
 let plugins = [
   new VueLoaderPlugin(),
-  new HtmlWebpackPlugin({ template: './src/index.html', inject: false })
+  new HtmlWebpackPlugin({ 
+    template: './src/index.html', 
+    filename: path.resolve(__dirname, 'dist/index.html') 
+  })
 ];
 
 if(mode === 'production'){
@@ -25,10 +28,10 @@ if(mode === 'production'){
       sortAttributes: true
     },
     renderer: new Renderer({
-        headless: false,
-        renderAfterDocumentEvent: 'render-event',
-        args: ['–no-sandbox', '–disable-setuid-sandbox']
-      })
+      headless: false,
+      renderAfterDocumentEvent: 'render-event',
+      args: ['–no-sandbox', '–disable-setuid-sandbox']
+    })
   }));
 }
 
@@ -46,19 +49,26 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     compress: true,
-    port: 9000
+    port: 9000,
+    historyApiFallback: true
   },
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.esm.js'
-    },
-    extensions: ['*', '.js', '.vue', '.json']
+    }
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
         use: 'vue-loader'
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader'
+        }
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
@@ -71,16 +81,16 @@ module.exports = {
       {
         test: /\.scss$/,
         use: [
-            "style-loader",
-            "css-loader",
-            "sass-loader"
+          "style-loader",
+          "css-loader",
+          "sass-loader"
         ]
       },
       {
         test: /\.css$/,
         use: [
-            "style-loader",
-            "css-loader",
+          "style-loader",
+          "css-loader",
         ]
       }
     ]

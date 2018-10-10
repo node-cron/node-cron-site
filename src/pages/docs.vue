@@ -62,7 +62,9 @@ export default {
         }
         .docs-content-container{
             flex: 1 1 auto;
-            margin-left: 30px;
+            @media screen and (min-width: 850px){
+                margin-left: 30px;
+            }
         }
         
     }

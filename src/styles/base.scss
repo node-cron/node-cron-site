@@ -9,17 +9,31 @@
 
 body {
     background-color: #e6e6e6;
+    padding-bottom: 20px;
 }
 
-h1 {
+h1, h2, h3{
     color: green;
     font-size: 40px;
     font-weight: 100;
-    text-align: center;
     margin-top: 100px;
     margin-bottom: 50px;
     display: block;
     width: 100%;
+}
+
+h2 {
+    font-size: 25px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+h3 {
+    font-size: 20px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    text-align: left;
 }
 
 p {
@@ -28,4 +42,16 @@ p {
 
 a {
     color: #006D00;
+}
+
+table {
+    border-spacing: 0px;
+    border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
+    td {
+        border-top: 1px solid #d2d2d2;
+        padding: 10px;
+        background-color: #f1f1f1;
+    }
 }

@@ -6,14 +6,21 @@
     color: #006D00;
 }
 
-.code {
-    padding: 10px;
-    padding-left: 20px;
-    padding-right: 20px;
-    color: #dedede;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    background-color: #363636;
-    border-radius: 5px;
-    width: 100%;
+pre {
+    code {
+        display: block;
+        padding-left: 20px;
+        padding-right: 20px;
+        color: #dedede;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        background-color: #363636;
+        border-radius: 5px;
+        width: 80%;
+        font-family: monospace;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
 }

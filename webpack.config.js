@@ -28,7 +28,7 @@ if(mode === 'production'){
       sortAttributes: true
     },
     renderer: new Renderer({
-      headless: false,
+      headless: true,
       renderAfterDocumentEvent: 'render-event',
       args: ['–no-sandbox', '–disable-setuid-sandbox']
     })

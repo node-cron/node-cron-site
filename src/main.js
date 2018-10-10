@@ -18,10 +18,13 @@ const routes = [
 ];
 
 const router = new VueRouter({
-    mode: process.env.NODE_ENV === 'production' ? 'history': '',
+    mode: 'history',
     routes
 });
 
-const app = new Vue({
-    router
+new Vue({
+    router,
+    mounted () {
+        document.dispatchEvent(new Event('render-event'));
+    }
 }).$mount('#app')

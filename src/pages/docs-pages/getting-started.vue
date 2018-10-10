@@ -7,15 +7,15 @@
         </p>
         <p>
             Import node-cron and schedule a task:
-            <code>
-                <pre>
+            <pre>
+                <code>
 var cron = require('node-cron');
 
 cron.schedule('* * * * *', () => {
     console.log('running a task every minute');
 });
-                </pre>  
-            </code>
+                </code>
+            </pre>  
         </p>
         <p>
             See the <router-link to="/docs#cron-syntax">cron syntax</router-link> tho create diferent expressions for jobs scheduling.

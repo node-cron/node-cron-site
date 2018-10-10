@@ -17,10 +17,20 @@ if(mode === 'production'){
   plugins.push(new PrerenderSPAPlugin({
     staticDir: `${__dirname}/dist`,
     routes: ['/', '/docs'],
-    renderer: new Renderer()
+    minify: {
+      collapseBooleanAttributes: true,
+      collapseWhitespace: true,
+      decodeEntities: true,
+      keepClosingSlash: true,
+      sortAttributes: true
+    },
+    renderer: new Renderer({
+        headless: false,
+        renderAfterDocumentEvent: 'render-event',
+        args: ['–no-sandbox', '–disable-setuid-sandbox']
+      })
   }));
 }
-
 
 module.exports = {
   mode: mode,

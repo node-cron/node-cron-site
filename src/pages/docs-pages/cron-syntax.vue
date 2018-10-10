@@ -5,8 +5,8 @@
             This is a quick reference to cron syntax and also shows the options supported by node-cron.
         </p>
         <h3>Allowed fields</h3>
-        <code>
-            <pre>
+        <pre>
+            <code>
 # ┌────────────── second (optional)
 # │ ┌──────────── minute
 # │ │ ┌────────── hour
@@ -16,8 +16,8 @@
 # │ │ │ │ │ │
 # │ │ │ │ │ │
 # * * * * * *
-            </pre>
-        </code>
+            </code>
+        </pre>
 
         <h3>Allowed values</h3>
         <table>
@@ -58,62 +58,62 @@
         <h3>Using multiples values</h3>
         You may use multiples values separated by comma:
 
-        <code>
-            <pre>
+        <pre>
+            <code>
 var cron = require('node-cron');
 
 cron.schedule('1,2,4,5 * * * *', () => {
     console.log('running every minute 1, 2, 4 and 5');
 });
-            </pre>
-        </code>
+            </code>
+        </pre>
 
         <h3>Using ranges</h3>
         You may also define a range of values:
 
-        <code>
-            <pre>
+        <pre>
+            <code>
 var cron = require('node-cron');
 
 cron.schedule('1-5 * * * *', () => {
   console.log('running every minute to 1 from 5');
 });
-            </pre>
-        </code>
+            </code>
+        </pre>
 
         <h3>Using step values</h3>
         Step values can be used in conjunction with ranges, following a range with '/' and a number. e.g: 1-10/2 that is the same as 2,4,6,8,10. Steps are also permitted after an asterisk, so if you want to say “every two minutes”, just use */2.
-        <code>
-            <pre>
+        <pre>
+            <code>
 var cron = require('node-cron');
 
 cron.schedule('*/2 * * * *', () => {
   console.log('running a task every two minutes');
 });
-            </pre>
-        </code>
+            </code>
+        </pre>
 
         <h3>Using names</h3>
         For month and week day you also may use names or short names. e.g:
-        <code>
-            <pre>
+        <pre>
+            <code>
 var cron = require('node-cron');
 
 cron.schedule('* * * January,September Sunday', () => {
   console.log('running on Sundays of January and September');
 });
-            </pre>
-        </code>
+            </code>
+        </pre>
 
         Or with short names:
-        <code>
-            <pre>
+        <pre>
+            <code>
 var cron = require('node-cron');
 
 cron.schedule('* * * Jan,Sep Sun', () => {
   console.log('running on Sundays of January and September');
 });
-            </pre>
-        </code>
+            </code>
+        </pre>
     </div>
 </template>

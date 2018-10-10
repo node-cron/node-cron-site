@@ -30,6 +30,7 @@ export default {
   .slogan {
     text-align: center;
     height: 100%;
+    margin-top: 100px;
 
     button {
       margin-top: 30px;

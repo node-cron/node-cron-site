@@ -1,6 +1,6 @@
 <template>
     <div class="demo">
-        <div class="demo-container">
+        <div class="glorious-demo-container">
         </div>
     </div>
 </template>
@@ -18,7 +18,7 @@
         },
         methods: {
             play: function () {   
-                const demo = new GDemo('.demo-container');
+                const demo = new GDemo('.glorious-demo-container');
 
                 const code = `
 const cron = require('node-cron');
@@ -55,14 +55,9 @@ cron.schedule('* * * * * *', function () {
         text-align: center;
         margin-top: 80px;
         height: 400px;
-
-        .demo-container {
-            text-align: left;
-            width: 95%;
-            margin-left: auto;
-            margin-right: auto;
-            margin-top: 40px;
-        }
+    }
+    .glorious-demo-container{
+        text-align: left;
     }
 </style>
 

@@ -1,14 +1,14 @@
 <template>
     <page-layout>
-      <div>
-        <div class="slogan">
+        <div class="home">
           <container>
             <h1>A simple cron-like job scheduler for Node.js</h1>
-            <demo></demo>
+            <div class="demo-container">
+              <demo></demo>
+            </div>
             <router-link to="/docs" class="btn btn-primary btn-large">Getting Started</router-link>
           </container>
         </div>
-      </div>
     </page-layout>
 </template>
 
@@ -27,7 +27,7 @@ export default {
 </script>
 
 <style lang="scss">
-  .slogan {
+  .home {
     text-align: center;
     height: 100%;
     margin-top: 100px;
@@ -35,6 +35,16 @@ export default {
     button {
       margin-top: 30px;
     }
+  }
+
+  .demo-container {
+    width: 95%;
+    @media screen and (min-width: 850px){
+      width: 70%;
+    }
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 40px;
   }
 </style>
 

@@ -12,7 +12,8 @@ let plugins = [
   new VueLoaderPlugin(),
   new HtmlWebpackPlugin({ 
     template: './src/index.html', 
-    filename: path.resolve(__dirname, 'dist/index.html') 
+    filename: path.resolve(__dirname, 'dist/index.html'),
+    inject: false
   })
 ];
 

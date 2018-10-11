@@ -3,6 +3,9 @@ const path = require('path');
 
 const { VueLoaderPlugin } = require('vue-loader');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const PrerenderSPAPlugin = require('prerender-spa-plugin');
 const Renderer = PrerenderSPAPlugin.PuppeteerRenderer;
 
@@ -10,9 +13,16 @@ let mode = process.env.NODE_ENV || 'development';
 
 let plugins = [
   new VueLoaderPlugin(),
+  new MiniCssExtractPlugin({
+    filename: "[name].min.css",
+    chunkFilename: "[id].css"
+  }),
   new HtmlWebpackPlugin({ 
     template: './src/index.html', 
     filename: path.resolve(__dirname, 'dist/index.html'),
+    minify: {
+      collapseWhitespace: true
+    },
     inject: false
   })
 ];
@@ -68,7 +78,10 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
         }
       },
       {
@@ -80,21 +93,31 @@ module.exports = {
         }
       },
       {
-        test: /\.scss$/,
+        test: /\.css$/,
         use: [
-          "style-loader",
-          "css-loader",
-          "sass-loader"
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
+          "css-loader"
         ]
       },
       {
-        test: /\.css$/,
+        test: /\.scss$/,
         use: [
-          "style-loader",
-          "css-loader",
-        ]
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'sass-loader',
+        ],
       }
     ]
   },
-  plugins: plugins
+  plugins: plugins,
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin({
+        sourceMap: true
+      }),
+      new OptimizeCSSAssetsPlugin({})
+    ]
+  },
 }

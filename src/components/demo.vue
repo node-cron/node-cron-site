@@ -13,7 +13,7 @@
     import 'prismjs/themes/prism-tomorrow.css';
 
     export default {
-         mounted(){
+        mounted(){
             this.play();
         },
         methods: {

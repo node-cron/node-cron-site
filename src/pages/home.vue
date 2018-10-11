@@ -38,9 +38,9 @@ export default {
   }
 
   .demo-container {
-    width: 95%;
-    @media screen and (min-width: 850px){
-      width: 70%;
+    width: 70%;
+    @media screen and (max-width: 850px){
+      width: 95%;
     }
     margin-left: auto;
     margin-right: auto;

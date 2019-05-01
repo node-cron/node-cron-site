@@ -7,15 +7,23 @@
         </p>
         <p>
             Import node-cron and schedule a task:
-            <pre>
-                <code>
+            <js-code>
 var cron = require('node-cron');
 
 cron.schedule('* * * * *', () => {
     console.log('running a task every minute');
 });
-                </code>
-            </pre>  
+            </js-code> 
         </p>
     </div>
 </template>
+
+<script>
+import JsCode from '../../components/js-code.vue';
+
+export default {
+    components: {
+        JsCode
+    }
+}
+</script>

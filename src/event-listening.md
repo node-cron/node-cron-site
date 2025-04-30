@@ -10,12 +10,12 @@ These events let you respond to specific moments in a task’s execution — lik
 
 | Event                          | Payload?     | Description                                                                 |
 |-------------------------------|--------------|-----------------------------------------------------------------------------|
-| `task-started`                | ✅ `CronEvent` | Emitted right before the task function is executed. Includes context like execution time and reason. |
-| `task-done`                   | ✅ `any`       | Emitted after the task finishes. Passes the return value of the task.      |
-| `scheduler-started`           | ❌ None        | Emitted when the scheduler is started via `.start()`.                      |
-| `scheduler-stopped`           | ❌ None        | Emitted when the scheduler is stopped via `.stop()`.                       |
-| `scheduler-destroyed`         | ❌ None        | Emitted when the task is permanently destroyed via `.destroy()`.           |
-| `task-execution-limit-reached` | ❌ None        | Emitted when `maxExecutions` (if defined) is reached. The task is destroyed. |
+| `task-started`                | `CronEvent` | Emitted right before the task function is executed. Includes context like execution time and reason. |
+| `task-done`                   | `any`       | Emitted after the task finishes. Passes the return value of the task.      |
+| `scheduler-started`           | None        | Emitted when the scheduler is started via `.start()`.                      |
+| `scheduler-stopped`           | None        | Emitted when the scheduler is stopped via `.stop()`.                       |
+| `scheduler-destroyed`         | None        | Emitted when the task is permanently destroyed via `.destroy()`.           |
+| `task-execution-limit-reached` | None        | Emitted when `maxExecutions` (if defined) is reached. The task is destroyed. |
 
 
 ## Example

@@ -13,16 +13,14 @@ hero:
     - theme: brand
       text: Getting Started
       link: /getting-started
-    - theme: alt
-      text: API Examples
-      link: /api-examples
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: 🔁 Cron Syntax Scheduling
+    details: Easily schedule recurring tasks using standard cron syntax — minutes, hours, days, months, and weekdays.
+  - title: 🪶 Zero Dependencies
+    details: Lightweight and production-ready. Pure JavaScript with no native or external dependencies.
+  - title: 🕹️ Full Runtime Control
+    details: Start, stop, or destroy scheduled tasks dynamically using simple methods like `.start()`, `.stop()`, and `.destroy()`.
+  - title: ⚙️ Runs in Background Without Blocking
+    details: Executes tasks in the background without blocking the Node.js event loop — ideal for non-disruptive automation.
 ---
-

@@ -17,6 +17,8 @@ export default {
         items: [
           { text: 'Getting Started', link: '/getting-started' },
           { text: 'Cron Syntax', link: '/cron-syntax' },
+          { text: 'Task Controls', link: '/task-controls' },
+          { text: 'Listening to Task Events', link: '/event-listening' },
           { text: 'Background Tasks', link: '/background-tasks' }
         ]
       }
@@ -26,11 +28,5 @@ export default {
       { icon: 'npm', link: 'https://www.npmjs.com/package/node-cron' },
       { icon: 'github', link: 'https://github.com/noce-cron/node-cron' }
     ],
-
-    markdown:{
-      toc: {
-        level: [2,3,4]
-      },
-    },
   }
 }

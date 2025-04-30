@@ -2,6 +2,11 @@
 
 Background Tasks allows you to schedule recurring jobs that run in separate forked processes using Node’s `child_process`. This ensures that background tasks are isolated from the main application, improving reliability and performance. Each task is defined in its own file and triggered via a cron expression, offering a clean, modular approach to background automation.
 
+> [!WARNING]
+> Background tasks are currently **experimental** and may not be fully stable or production-ready.  
+> They are subject to changes in future releases, and their behavior may differ depending on the environment or configuration.  
+> Use them with caution and consider alternative task scheduling options for critical production workflows.
+
 ## How to Use
 
 **1. Create a Task File** 

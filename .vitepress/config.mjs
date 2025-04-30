@@ -3,6 +3,7 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default {
   outDir: './dist',
+  srcDir: './src',
   title: "Node-Cron",
   description: "A Lightweight Task Scheduler for Node.js",
   themeConfig: {

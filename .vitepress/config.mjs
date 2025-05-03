@@ -6,6 +6,20 @@ export default {
   srcDir: './src',
   title: "node-cron",
   description: "A Lightweight Task Scheduler for Node.js",
+  head: [
+    [
+      'script',
+      { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-M6MDH0HR0C' }
+    ],
+    [
+      'script',
+      {},
+      `window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-M6MDH0HR0C');`
+    ]
+  ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -28,21 +42,6 @@ export default {
     socialLinks: [
       { icon: 'npm', link: 'https://www.npmjs.com/package/node-cron' },
       { icon: 'github', link: 'https://github.com/noce-cron/node-cron' }
-    ],
-
-    head: [
-      [
-        'script',
-        { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-M6MDH0HR0C' }
-      ],
-      [
-        'script',
-        {},
-        `window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M6MDH0HR0C');`
-      ]
     ],
 
     footer: {

@@ -52,11 +52,11 @@ The task-started event provides a CronEvent payload with metadata about the task
 ```ts
 export type CronEvent = {
   date: Date;
-  missedExecutions: number;
-  matchedDate?: string;
+  missedCount: number;
+  dateLocalIso: string;
   reason: string;
   task?: ScheduledTask;
-};
+}
 ```
 
 #### Field Descriptions

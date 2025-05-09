@@ -32,6 +32,7 @@ export default {
         items: [
           { text: 'Getting Started', link: '/getting-started' },
           { text: 'Cron Syntax', link: '/cron-syntax' },
+          { text: 'Node-Cron Module', link: '/api-reference' },
           { text: 'Scheduling Options', link: '/scheduling-options' },
           { text: 'Task Controls', link: '/task-controls' },
           { text: 'Listening to Task Events', link: '/event-listening' },

@@ -79,6 +79,7 @@ export type Options = {
   maxExecutions?: number;
 };
 ```
+
 Key updates:
   - name: You can now specify a name for the task (useful for debugging or logging).
   - timezone: Defines the timezone in which the cron expression should be interpreted.

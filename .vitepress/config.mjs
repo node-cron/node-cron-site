@@ -45,7 +45,7 @@ export default {
 
     socialLinks: [
       { icon: 'npm', link: 'https://www.npmjs.com/package/node-cron' },
-      { icon: 'github', link: 'https://github.com/noce-cron/node-cron' }
+      { icon: 'github', link: 'https://github.com/node-cron/node-cron' }
     ],
 
     footer: {

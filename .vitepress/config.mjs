@@ -32,9 +32,12 @@ export default {
         items: [
           { text: 'Getting Started', link: '/getting-started' },
           { text: 'Cron Syntax', link: '/cron-syntax' },
-          { text: 'Task Controls', link: '/task-controlls' },
+          { text: 'Scheduling Options', link: '/scheduling-options' },
+          { text: 'Task Controls', link: '/task-controls' },
           { text: 'Listening to Task Events', link: '/event-listening' },
-          { text: 'Background Tasks', link: '/background-tasks' }
+          { text: 'Background Tasks', link: '/background-tasks' },
+          { text: 'Migrationg from V3', link: '/migrating-from-v3' },
+         
         ]
       }
     ],

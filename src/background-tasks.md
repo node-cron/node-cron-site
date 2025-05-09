@@ -8,7 +8,7 @@ Background Tasks allows you to schedule recurring jobs that run in separate fork
 
 Write a file that exports a task function. This function will contain the logic you want to run on a schedule.
 ```js
-// ./tasks//my-task.js
+// ./tasks/my-task.js
 exports.task = () => {
   return 'Hello from background task!';
 };
@@ -31,7 +31,7 @@ Use the BackgroundScheduledTask class to register and start the task.
 ```js
 import cron from 'node-cron';
 
-cron.schedule('*/5 * * * * *', './tasks//my-task.js');
+cron.schedule('*/5 * * * * *', './tasks/my-task.js');
 ```
 
 ## How It Works Internally

@@ -3,66 +3,143 @@ outline: deep
 ---
 
 # Task Controls
-When scheduling a task with `cron.schedule` function it accepts a cron expression, a task (either as a function or a path to a task file), and optional configuration.
+When scheduling a task with `cron.schedule`, you pass a cron expression, a task (function or path to a file), and optional configuration.
+
+This function returns a `ScheduledTask` instance, which provides a consistent interface for managing and introspecting both in-process and background tasks.
 
 ```js
 const task = cron.schedule('* * * * *', () = > {
   //
+}, { nOoverlap: true });
+const task = cron.schedule('* * * * *', () => {
+  // your task logic here
 }, { scheduled: false });
 
-task.getStatus(); // stopped
+await task.getStatus(); // 'stopped'
 
-task.start();     // starts the scheduler
+await task.start();     // starts the scheduler
 
-task.getStatus(); // idle
+await task.getStatus(); // 'idle'
 
-// when task is running
-task.getStatus(); // running
+// when task is actively running
+await task.getStatus(); // 'running'
 
-task.stop() // stops the scheduler
+await task.stop();      // stops the scheduler
 
-task.execute(); // manually performs the task
+await task.execute();   // manually runs the task immediately
 
-task.destroy() // stops the scheduler and releases the resources
+await task.destroy();   // stops and permanently removes the task
 ```
 
-This function returns an object that implements the ScheduledTask interface. Whether you're using a simple in-process task or a background task that runs in a separate process, the returned object provides the same set of utility methods for managing the task's lifecycle and triggering it manually.
-
 ## ScheduledTask Interface
-The ScheduledTask interface defines a standard contract for scheduled task behavior. This allows your code to interact with any scheduled task in a consistent way — starting, stopping, executing, or destroying it, regardless of the underlying implementation.
+The `ScheduledTask` interface defines the contract for interacting with any task, whether it's basic or runs in a background process.
 
 ```ts
 export interface ScheduledTask {
-  start(): void;
-  stop(): void;
-  getStatus(): string;
-  destroy(): void;
-  execute(event?: CronEvent): Promise<any>;
+  id: string;
+  name?: string;
+
+  start(): void | Promise<void>;
+  stop(): void | Promise<void>;
+  getStatus(): string | Promise<string>;
+  destroy(): void | Promise<void>;
+  execute(): Promise<any>;
+  getNextRun(): Date | null;
+
+  on(event: TaskEvent, fn: (context: TaskContext) => void | Promise<void>): void;
+  off(event: TaskEvent, fn: (context: TaskContext) => void | Promise<void>): void;
+  once(event: TaskEvent, fn: (context: TaskContext) => void | Promise<void>): void;
 }
 ```
 
+**Note:** `on`, `off` and `once` functions are addressed at [Event Listening Guide](/event-listening)
+
 ## Method Descriptions
 
-### `start(): void`
-Begins the task scheduler.  
-For background tasks, this also forks a new process and starts a daemon responsible for managing the schedule and execution.
+## Method Descriptions
 
-### `stop(): void`
-Stops the task from running in the future:
-- For **basic (in-process)** tasks, it halts the scheduler but allows any currently running job to finish.
-- For **background tasks**, it terminates the child process immediately — stopping the scheduler **and** any running job.
+---
 
-### `getStatus(): string`
-Returns the current lifecycle status of the task. Typical values include:
-- `'running'` – task is actively executing.
-- `'idle'` – task is scheduled but not currently running.
-- `'stopped'` – scheduler is inactive.
-- `'destroyed'` – task has been permanently removed.
+### `start(): void | Promise<void>`
 
-### `destroy(): void`
-Fully removes the task and cleans up its resources.  
-For background tasks, this also kills the process, detaches listeners, and deletes any persistent metadata.
+Starts the task scheduler.
 
-### `execute(event?: any): Promise<any>`
-Manually executes the task immediately, regardless of its schedule.  
-Returns a `Promise` with the result of the execution or rejects if the task is not active or running (e.g., in a background task with no active process).
+- For **basic (in-process)** tasks: begins evaluating the cron expression and running the task at matched times.
+- For **background** tasks: forks a dedicated process and starts a daemon to handle scheduled execution.
+- Has no effect if the task is already running.
+
+---
+
+### `stop(): void | Promise<void>`
+
+Stops the scheduler and prevents the task from running in the future.
+
+- For **basic tasks**: halts the scheduler but allows any currently running job to finish.
+- For **background tasks**: terminates the child process immediately.
+
+> Note: This does not permanently remove the task — use `destroy()` for that.
+
+---
+
+### `getStatus(): string | Promise<string>`
+
+Returns the current lifecycle state of the task. Typical values include:
+
+- `'stopped'` – Scheduler is not running.
+- `'idle'` – Scheduler is running, task is not currently executing.
+- `'running'` – Task is actively executing.
+- `'destroyed'` – Task has been permanently removed.
+
+Useful for monitoring or debugging task state.
+
+---
+
+### `destroy(): void | Promise<void>`
+
+Permanently deactivates the task and cleans up all internal resources.
+
+- For background tasks: kills the associated process, detaches event listeners, and removes persistent state.
+- After destruction, no other method (besides `getStatus`) should be called.
+
+---
+
+### `execute(): Promise<any>`
+
+Manually executes the task function immediately, outside of its scheduled time.
+
+- Useful for testing, debugging, or triggering ad-hoc runs.
+- Returns a `Promise` that resolves with the task’s result, or rejects on failure.
+- All appropriate lifecycle events are emitted (`execution:started`, `execution:finished`, `execution:failed`, etc.).
+- If the task is destroyed or in an invalid state, the call may throw or reject.
+
+---
+
+### `getNextRun(): Date | null`
+
+Returns the next scheduled run time for the task, or `null` if the scheduler is stopped or the task is destroyed.
+
+- May return `null` if the cron expression does not yield a future match (e.g. expired schedule).
+
+---
+
+### `on(event: TaskEvent, fn: (context: TaskContext) => void | Promise<void>): void`
+
+Subscribes to a specific lifecycle event.
+
+- The callback receives a `TaskContext` object with metadata about the task and execution.
+- Can be used for logging, metrics, custom side effects, or failure handling.
+
+```ts
+task.on('execution:failed', (ctx) => {
+  console.error(`Task ${ctx.task?.id} failed:`, ctx.execution?.error);
+});
+```
+
+### `off(event: TaskEvent, fn: (context: TaskContext) => void | Promise<void>): void`
+
+Removes a previously registered event listener.
+ - Use this to stop listening to specific task or execution events.
+
+### `once(event: TaskEvent, fn: (context: TaskContext) => void | Promise<void>): void`
+Subscribes to an event once. The callback is automatically removed after the first invocation.
+ - Useful for temporary hooks or one-time monitoring.

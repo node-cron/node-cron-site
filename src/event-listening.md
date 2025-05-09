@@ -1,87 +1,103 @@
 # Listening to Task Events
 
-All scheduled tasks — both basic and background — extend `EventEmitter` and emit lifecycle events that you can listen to using `.on()` or `.once()`.
+Scheduled tasks — both basic and background — support lifecycle event subscriptions through the `.on()`, `.once()`, and `.off()` methods.
 
-These events let you respond to specific moments in a task’s execution — like when it starts, finishes, or is stopped manually or automatically.
-
----
+These events let you react to key moments in a task’s lifecycle, such as when it starts, finishes, fails, or is destroyed. Every listener receives a `TaskContext` object containing detailed metadata about the task and its execution.
 
 ## Available Events
 
-| Event                          | Payload?     | Description                                                                 |
-|-------------------------------|--------------|-----------------------------------------------------------------------------|
-| `task-started`                | `CronEvent` | Emitted right before the task function is executed. Includes context like execution time and reason. |
-| `task-done`                   | `any`       | Emitted after the task finishes. Passes the return value of the task.      |
-| `scheduler-started`           | None        | Emitted when the scheduler is started via `.start()`.                      |
-| `scheduler-stopped`           | None        | Emitted when the scheduler is stopped via `.stop()`.                       |
-| `scheduler-destroyed`         | None        | Emitted when the task is permanently destroyed via `.destroy()`.           |
-| `task-execution-limit-reached` | None        | Emitted when `maxExecutions` (if defined) is reached. The task is destroyed. |
+| Event                  | Payload       | Description                                                          |
+| ---------------------- | ------------- | -------------------------------------------------------------------- |
+| `task:started`         | `TaskContext` | Emitted when the task is started via `.start()`.                     |
+| `task:stopped`         | `TaskContext` | Emitted when the task is stopped via `.stop()`.                      |
+| `task:destroyed`       | `TaskContext` | Emitted when the task is destroyed via `.destroy()`.                 |
+| `execution:started`    | `TaskContext` | Emitted right before the task callback is executed.                  |
+| `execution:finished`   | `TaskContext` | Emitted after the task successfully finishes.                        |
+| `execution:failed`     | `TaskContext` | Emitted when the task throws an error.                               |
+| `execution:missed`     | `TaskContext` | Emitted when a scheduled execution is missed.                        |
+| `execution:overlap`    | `TaskContext` | Emitted when a scheduled execution is skipped due to an ongoing one. |
+| `execution:maxReached` | `TaskContext` | Emitted when `maxExecutions` is reached. The task is destroyed.      |
+
 
 
 ## Example
 
 ```js
-const task = cron.schedule('* * * * *', (event) => {
-  console.log('Running task at', event.date);
+const task = cron.schedule('* * * * *', async (context) => {
+  console.log('Running task at', context.date);
   return 'done';
 });
 
-task.on('task-started', (event) => {
-  console.log('Task started:', event.reason);
+task.on('execution:started', (ctx) => {
+  console.log('Execution started at', ctx.date, 'Reason:', ctx.execution?.reason);
 });
 
-task.on('task-done', (result) => {
-  console.log('Task finished. Result:', result);
+task.on('execution:finished', (ctx) => {
+  console.log('Execution finished. Result:', ctx.execution?.result);
 });
 
-task.on('scheduler-started', () => {
-  console.log('Scheduler started');
+task.on('execution:failed', (ctx) => {
+  console.error('Execution failed with error:', ctx.execution?.error?.message);
 });
 
-task.on('task-execution-limit-reached', () => {
-  console.warn('Max executions reached. Task will be destroyed.');
+task.on('execution:maxReached', (ctx) => {
+  console.warn(`Task "${ctx.task?.id}" reached max executions.`);
 });
 ```
 
-##  CronEvent Payload
+## TaskContext Payload
 
-The task-started event provides a CronEvent payload with metadata about the task execution. This is useful for logging, debugging, or implementing custom logic based on the execution context.
+Every event now provides a `TaskContext` object for consistent access to timing and execution metadata.
 
 ### Type Definition
 
 ```ts
-export type CronEvent = {
+export type TaskContext = {
   date: Date;
-  missedCount: number;
   dateLocalIso: string;
-  reason: string;
+  triggeredAt: Date;
   task?: ScheduledTask;
+  execution?: Execution;
 }
 ```
 
 #### Field Descriptions
 
-| Field             | Type              | Description                                                                 |
-|------------------|-------------------|-----------------------------------------------------------------------------|
-| `date`           | `Date`            | The exact timestamp when the task was triggered, respecting the server timezone.|
-| `missedExecutions` | `number`        | The number of scheduled executions that were missed (e.g., due to downtime). |
-| `matchedDate`    | `string` (optional) | A human-readable string showing the matched cron time at the defined timezone.|
-| `reason`         | `string`          | The reason the task was executed. Can be `'manual'`, `'time-matched'`, or `'initial'`. |
-| `task`           | `ScheduledTask` (optional) | A reference to the task instance that was executed. Useful for introspection or advanced handling. |
+| Field          | Type            | Description                                                               |
+| -------------- | --------------- | ------------------------------------------------------------------------- |
+| `date`         | `Date`          | Timestamp when the task was scheduled to run (or did run).                |
+| `dateLocalIso` | `string`        | Human-readable local timestamp string, using the provided timezone.       |
+| `triggeredAt`  | `Date`          | Actual time the event was emitted. Useful for debugging latency or drift. |
+| `task`         | `ScheduledTask` | Reference to the task instance.                                           |
+| `execution`    | `Execution?`    | Execution info if relevant to the event (null for non-execution events).  |
 
-#### Sample Payload
+
+### Execution Type
+
+This structure is embedded in TaskContext.execution and represents a single run of a task:
+
 ```js
-{
-  date: 2025-04-30T14:05:35.165Z,
-  missedExecutions: 0,
-  matchedDate: 'Wed, 04/30/2025, 11:05:35',
-  reason: 'time-matched',
-  task: ScheduledTask { ... }
+export type Execution = {
+  id: string;
+  reason: 'invoked' | 'scheduled';
+  startedAt?: Date;
+  finishedAt?: Date;
+  error?: Error;
+  result?: any;
 }
 ```
+#### Execution Fields
+| Field        | Type     | Description                                                       |
+| ------------ | -------- | ----------------------------------------------------------------- |
+| `id`         | `string` | Unique ID for this execution.                                     |
+| `reason`     | `string` | Why the task was triggered — either `'invoked'` or `'scheduled'`. |
+| `startedAt`  | `Date?`  | Time execution started.                                           |
+| `finishedAt` | `Date?`  | Time execution finished.                                          |
+| `error`      | `Error?` | Error thrown, if any.                                             |
+| `result`     | `any?`   | Return value of the task if successful.                           |
+
 
 ## Notes
-
-- Events like task-started and task-done include useful payloads. Others are purely signals.
-- All event listeners should be added before starting the task to avoid missing early signals.
-- Background tasks emit the same events, but they’re relayed from the child process and may experience slight delays.
+ - All event listeners receive a `TaskContext`, even for events like task:stopped or execution:missed.
+ - Always attach listeners before calling `.start()` to avoid missing early events.
+ - Background tasks emit the same events with the same context, relayed from the worker process.

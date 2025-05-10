@@ -1,4 +1,4 @@
-# Listening to Task Events
+# Event Listening
 
 Scheduled tasks — both basic and background — support lifecycle event subscriptions through the `.on()`, `.once()`, and `.off()` methods.
 

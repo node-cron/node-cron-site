@@ -27,7 +27,7 @@ export function task() => {
 
 **2. Schedule the Task**
 
-Use the BackgroundScheduledTask class to register and start the task.
+Use the task file path to register and start the task.
 ```js
 import cron from 'node-cron';
 

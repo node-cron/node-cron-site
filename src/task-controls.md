@@ -56,8 +56,6 @@ export interface ScheduledTask {
 
 ## Method Descriptions
 
-## Method Descriptions
-
 ---
 
 ### `start(): void | Promise<void>`

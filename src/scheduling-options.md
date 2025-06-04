@@ -10,6 +10,7 @@ export type Options = {
   timezone?: string;
   noOverlap?: boolean;
   maxExecutions?: number;
+  maxRandomDelay?: number;
 };
 ```
 
@@ -21,6 +22,7 @@ export type Options = {
 | `timezone`       | `string`  | The timezone in which the cron expression should be interpreted. This should be a valid timezone name as recognized by `Intl.DateTimeFormat` (e.g., `"America/Sao_Paulo"`, `"UTC"`, `"Europe/London"`). Defaults to system timezone if not specified. |
 | `noOverlap`      | `boolean` | If `true`, prevents overlapping runs. If a task is still executing when the next scheduled time arrives, the new run is skipped. Defaults to `false`|
 | `maxExecutions`  | `number`  | Sets a limit on how many times the task should execute. After reaching this count, the task is automatically destroyed. |
+| `maxRandomDelay` | `number`  | (Jitter) Adds up to the specified number of milliseconds of random delay before executing each scheduled run. Useful to prevent “thundering herd” effects when many tasks are scheduled at the same time. Default is 0 (no delay). |
 
 > 🛈 Unlike older versions, `scheduled` and `runOnInit` are no longer used. By default, tasks are scheduled and started immediately upon creation. If you need a task that is initially stopped, use the `createTask` function. To manually run a task immediately after scheduling, simply call `task.execute()` after the task has been scheduled.
 

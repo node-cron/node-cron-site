@@ -11,9 +11,6 @@ This function returns a `ScheduledTask` instance, which provides a consistent in
 const task = cron.schedule('* * * * *', () = > {
   //
 }, { nOoverlap: true });
-const task = cron.schedule('* * * * *', () => {
-  // your task logic here
-}, { scheduled: false });
 
 await task.getStatus(); // 'stopped'
 

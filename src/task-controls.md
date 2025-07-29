@@ -10,7 +10,7 @@ This function returns a `ScheduledTask` instance, which provides a consistent in
 ```js
 const task = cron.schedule('* * * * *', () = > {
   //
-}, { nOoverlap: true });
+}, { noOverlap: true });
 
 await task.getStatus(); // 'stopped'
 

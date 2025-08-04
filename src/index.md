@@ -24,3 +24,12 @@ features:
   - title: ⚙️ Runs in Background Without Blocking
     details: Executes tasks in the background without blocking the Node.js event loop — ideal for non-disruptive automation.
 ---
+
+
+::: tip Need more than cron?
+🚀 Check out [**Sidequest.js**](https://sidequestjs.com), a distributed job runner for Node.js inspired by Oban and Sidekiq.
+
+- Supports retries, priorities, schedules, and uniqueness
+- Works with Postgres, MySQL, SQLite, MongoDB, and Redis
+- Includes a clean web dashboard for real-time monitoring
+:::

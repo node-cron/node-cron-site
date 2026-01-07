@@ -37,7 +37,7 @@ export default {
           { text: 'Task Controls', link: '/task-controls' },
           { text: 'Event Listening', link: '/event-listening' },
           { text: 'Background Tasks', link: '/background-tasks' },
-          { text: 'Migrationg from V3', link: '/migrating-from-v3' },
+          { text: 'Migrating from V3', link: '/migrating-from-v3' },
          
         ]
       }

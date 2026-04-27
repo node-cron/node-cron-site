@@ -83,3 +83,4 @@ typings/
 
 .vitepress/cache
 .vitepress/dist
+dist

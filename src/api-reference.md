@@ -55,6 +55,39 @@ const task = cron.createTask('0 * * * *', () => {
 task.start();
 ```
 
+## 🔹 `getTasks(): Map<string, ScheduledTask>`
+
+Returns all tasks currently registered by node-cron, keyed by task id. Tasks created with `schedule` or `createTask` are registered automatically, and destroyed tasks are removed from the registry.
+
+```ts
+import cron from 'node-cron';
+
+const task = cron.schedule('* * * * *', () => {
+  console.log('Running every minute');
+});
+
+const tasks = cron.getTasks();
+
+console.log(tasks.has(task.id)); // true
+console.log(tasks.get(task.id) === task); // true
+```
+
+## 🔹 `getTask(taskId: string): ScheduledTask | undefined`
+
+Returns a registered task by id, or `undefined` when no task exists for that id.
+
+```ts
+import cron from 'node-cron';
+
+const task = cron.schedule('* * * * *', () => {
+  console.log('Running every minute');
+});
+
+const sameTask = cron.getTask(task.id);
+
+sameTask?.stop();
+```
+
 ## 🔹 `validate(expression: string): boolean`
 
 Validates whether a given cron expression is syntactically correct.

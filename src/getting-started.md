@@ -55,7 +55,7 @@ cron.schedule('* * * * *', async (ctx) => {
   console.log(`Task started at ${ctx.triggeredAt.toISOString()}`);
   console.log(`Scheduled for: ${ctx.dateLocalIso}`);
 
-  cosole.log(`Task status ${ctx.task.getStatus()}`)
+  console.log(`Task status ${ctx.task.getStatus()}`)
 });
 ```
 
@@ -63,10 +63,10 @@ The same may be done with background tasks:
 
 ```js
 // ./tasks/my-task.js
-export function task() => {
+export function task(ctx) {
   console.log(`Task started at ${ctx.triggeredAt.toISOString()}`);
   console.log(`Scheduled for: ${ctx.dateLocalIso}`);
-  cosole.log(`Task status ${ctx.task.getStatus()}`)
+  console.log(`Task status ${ctx.task.getStatus()}`)
 };
 
 ```

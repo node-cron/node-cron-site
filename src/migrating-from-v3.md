@@ -1,3 +1,9 @@
+---
+outline: deep
+title: Migrating from v3
+description: What changed between node-cron v3 and v4, covering the TypeScript rewrite, smarter scheduling, the streamlined Options type, createTask, and the new event names.
+---
+
 # Migration Guide: node-cron v3 to v4
 
 `node-cron` v4 represents a significant update, both in terms of internal optimizations and the move to TypeScript. This version improves task scheduling performance and provides a more flexible API for handling scheduled tasks.
@@ -70,21 +76,30 @@ v3 used the following options for scheduling tasks:
 ```
 #### v4:
 
-In v4, the task scheduling options have been streamlined into a single Options type, with updated field names. Notably, the `scheduled` and `runOnInit` fields are removed and replaced with the following:
-```js
+In v4, the task scheduling options have been streamlined into a single `Options` type, with updated field names. Notably, the `scheduled` and `runOnInit` fields are removed and replaced with the following:
+
+```ts
 export type Options = {
   name?: string;
   timezone?: string;
   noOverlap?: boolean;
   maxExecutions?: number;
+  maxRandomDelay?: number;
+  logger?: Logger;
+  suppressMissedWarning?: boolean;
 };
 ```
 
 Key updates:
-  - name: You can now specify a name for the task (useful for debugging or logging).
-  - timezone: Defines the timezone in which the cron expression should be interpreted.
-  - noOverlap: Prevents overlapping task executions.
-  - maxExecutions: Limits the number of executions before the task is automatically destroyed.
+  - `name`: A human-readable identifier for the task (useful for debugging or logging).
+  - `timezone`: The timezone in which the cron expression is interpreted.
+  - `noOverlap`: Prevents overlapping task executions.
+  - `maxExecutions`: Limits the number of executions before the task is automatically destroyed.
+  - `maxRandomDelay`: Adds random jitter (ms) before each run.
+  - `logger`: A per-task [logger](/logging) (not supported for background tasks).
+  - `suppressMissedWarning`: Silences the missed-execution warning.
+
+See [Scheduling Options](/scheduling-options) for the full reference.
 
 
 ### 3. Task Lifecycle Events
@@ -107,9 +122,9 @@ task.on('task-started', (event) => {
 });
 ```
 
-```js
 Example in v4 (New API):
 
+```js
 const task = cron.schedule('* * * * *', async () => {
   console.log('Running every minute');
 });

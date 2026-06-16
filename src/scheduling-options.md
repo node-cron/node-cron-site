@@ -1,8 +1,18 @@
+---
+outline: deep
+title: Scheduling Options
+description: Fine-tune node-cron tasks with timezone, noOverlap, maxExecutions, maxRandomDelay, name, logger, and suppressMissedWarning, with examples for each.
+---
+
 # Scheduling Options
 
-When you create a scheduled task using `cron.schedule(expression, task, options)`, you can pass an optional configuration object to control its behavior.
+A bare `cron.schedule(expression, task)` already covers the common case. As your jobs grow more demanding, the optional third argument lets you tune *how* they run, without changing the rest of your code.
 
-## Type Definition
+```js
+cron.schedule(expression, task, options);
+```
+
+## All options
 
 ```ts
 export type Options = {
@@ -11,107 +21,130 @@ export type Options = {
   noOverlap?: boolean;
   maxExecutions?: number;
   maxRandomDelay?: number;
+  logger?: Logger;
+  suppressMissedWarning?: boolean;
+  missedExecutionTolerance?: number;
 };
 ```
 
-## Field Descriptions
+| Option                  | Type      | Default | Description                                                                 |
+| ----------------------- | --------- | ------- | --------------------------------------------------------------------------- |
+| `name`                  | `string`  | task id | A human-readable identifier for the task. Useful for logging, debugging, and dashboards. |
+| `timezone`              | `string`  | system  | The timezone the cron expression is evaluated in. Any IANA name recognized by `Intl.DateTimeFormat` (e.g. `"America/Sao_Paulo"`, `"UTC"`, `"Europe/London"`). |
+| `noOverlap`             | `boolean` | `false` | If `true`, a scheduled run is **skipped** when the previous run is still executing, preventing overlapping executions. |
+| `maxExecutions`         | `number`  | none    | Maximum number of times the task may run. After the limit, the task is automatically destroyed. |
+| `maxRandomDelay`        | `number`  | `0`     | Adds up to this many milliseconds of random delay (jitter) before each run. Spreads out tasks that would otherwise fire simultaneously. |
+| `logger`                | `Logger`  | global  | A custom [logger](/logging) for this task, overriding the global one. **Not supported for [background tasks](/background-tasks).** |
+| `suppressMissedWarning` | `boolean` | `false` | Silences the "missed execution" warning for this task. See [Logging](/logging#suppressing-the-missed-execution-warning). |
+| `missedExecutionTolerance` | `number` | `1000` | How late (in ms) a scheduled run may wake and still execute instead of being reported as missed. Long timers drift (OS sleep, GC, throttling, clock skew), which can otherwise skip daily/weekly runs. Always capped to the gap to the next run, so it can never run a slot twice. |
 
-| Field            | Type      | Description                                                                 |
-|------------------|-----------|-----------------------------------------------------------------------------|
-| `name`           | `string`  | Optional identifier for the task. Useful for debugging, logging, or display in UIs. |
-| `timezone`       | `string`  | The timezone in which the cron expression should be interpreted. This should be a valid timezone name as recognized by `Intl.DateTimeFormat` (e.g., `"America/Sao_Paulo"`, `"UTC"`, `"Europe/London"`). Defaults to system timezone if not specified. |
-| `noOverlap`      | `boolean` | If `true`, prevents overlapping runs. If a task is still executing when the next scheduled time arrives, the new run is skipped. Defaults to `false`|
-| `maxExecutions`  | `number`  | Sets a limit on how many times the task should execute. After reaching this count, the task is automatically destroyed. |
-| `maxRandomDelay` | `number`  | (Jitter) Adds up to the specified number of milliseconds of random delay before executing each scheduled run. Useful to prevent “thundering herd” effects when many tasks are scheduled at the same time. Default is 0 (no delay). |
-
-> 🛈 Unlike older versions, `scheduled` and `runOnInit` are no longer used. By default, tasks are scheduled and started immediately upon creation. If you need a task that is initially stopped, use the `createTask` function. To manually run a task immediately after scheduling, simply call `task.execute()` after the task has been scheduled.
-
+> 🛈 There is no `scheduled` or `runOnInit` option anymore. Tasks created with `cron.schedule` start immediately; for a task that starts stopped, use [`cron.createTask`](/task-lifecycle#creating-a-stopped-task). To run a task immediately on demand, call [`task.execute()`](/task-lifecycle#execute). See [Migrating from v3](/migrating-from-v3).
 
 ## Examples
 
-### 1. Basic Scheduling with Default Options
-
-This example schedules a task to run every minute with the default options.
+### Default options
 
 ```js
-const task = cron.schedule('* * * * *', async () => {
-  console.log('Task is running every minute');
+import cron from 'node-cron';
+
+const task = cron.schedule('* * * * *', () => {
+  console.log('Running every minute');
 });
 ```
 
-In this case, the task will run immediately upon creation, using the system's timezone, without preventing overlapping runs or limiting the number of executions.
+Runs immediately on creation, in the system timezone, with overlapping runs allowed and no execution limit.
 
-### 2. Scheduling with a Custom Timezone
+### Custom timezone
 
-This example schedules a task with a custom timezone (America/Sao_Paulo), ensuring the cron expression is evaluated in that timezone.
+Evaluate the expression in a specific timezone, regardless of where the server runs:
 
 ```js
-const task = cron.schedule('* * * * *', async () => {
-  console.log('Running every minute in Sao Paulo timezone');
+import cron from 'node-cron';
+
+const task = cron.schedule('0 0 * * *', () => {
+  console.log('Midnight in São Paulo');
 }, {
-  timezone: 'America/Sao_Paulo'
+  timezone: 'America/Sao_Paulo',
 });
+```
 
-``` 
-Here, the task will run at the top of each minute based on the specified timezone.
+### Prevent overlapping runs
 
-### 3. Preventing Overlap Between Task Executions
-
-This example schedules a task that prevents overlap, meaning if a task is still running and the next scheduled time arrives, it will be skipped.
+If a task can take longer than its interval, `noOverlap` skips a run rather than starting it on top of the previous one:
 
 ```js
+import cron from 'node-cron';
+
 const task = cron.schedule('* * * * *', async () => {
-  console.log('Running every minute without overlap');
+  await slowJob(); // may take longer than a minute
 }, {
-  noOverlap: true
+  noOverlap: true,
 });
 ```
 
-With noOverlap: true, if the task takes more than a minute to execute, the next scheduled execution will be skipped to avoid overlapping.
+A skipped run emits an [`execution:overlap`](/event-listening) event.
 
-### 4. Limiting Task Executions
+### Limit the number of runs
 
-In this example, the task will stop running after it has executed a specified number of times (maxExecutions).
+The task destroys itself after the limit is reached:
 
 ```js
-const task = cron.schedule('* * * * *', async () => {
-  console.log('This will run only 5 times');
+import cron from 'node-cron';
+
+const task = cron.schedule('* * * * *', () => {
+  console.log('This runs 5 times, then the task is destroyed');
 }, {
-  maxExecutions: 5
+  maxExecutions: 5,
 });
 ```
 
-This task will automatically be destroyed after it has executed 5 times.
+Reaching the limit emits [`execution:maxReached`](/event-listening). For a one-shot task, set `maxExecutions: 1`.
 
+### Add jitter to avoid a thundering herd
 
-### 5. Creating a Stopped Task (via createTask)
-
-If you need a task to be initially stopped (not run right away), you can use the createTask function. This example shows how to create a task that starts only when explicitly told to.
+When many instances schedule the same job at the same instant (e.g. across a fleet), `maxRandomDelay` staggers them:
 
 ```js
-const task = cron.createTask('* * * * *', async () => {
-  console.log('This task is manually started');
+import cron from 'node-cron';
+
+const task = cron.schedule('0 * * * *', () => {
+  refreshCache();
 }, {
-  noOverlap: true
+  maxRandomDelay: 30_000, // up to 30s of random delay per run
 });
-
-// Task is not started immediately; it will run only when `.start()` is called.
-task.start();
 ```
-This will create a task that is stopped by default. You can control when it starts by calling task.start().
 
+### Name a task
 
-### 6. Manually Running a Task After Scheduling
-
-If you want to manually run a task immediately after scheduling, you can call task.execute().
+A `name` makes logs and dashboards readable, and is exposed as `task.name`:
 
 ```js
-const task = cron.schedule('* * * * *', async () => {
-  console.log('Running the task every minute');
+import cron from 'node-cron';
+
+const task = cron.schedule('0 3 * * *', () => {}, {
+  name: 'nightly-backup',
 });
 
-// Manually run the task right after it's scheduled
-task.execute();
+console.log(task.name); // 'nightly-backup'
 ```
 
-In this case, the task will run immediately after it has been scheduled, even though the cron expression is set to run every minute.
+### Tolerate late executions
+
+A heartbeat is armed to fire at the scheduled time, but long timers drift (OS sleep, GC, CPU throttling, clock skew), so the callback can wake a little late. By default a run that wakes within `missedExecutionTolerance` (1000ms) still executes; later than that, it is reported as [missed](/event-listening). On an underpowered host, or a daily/weekly job that can wake several seconds late, raise it:
+
+```js
+import cron from 'node-cron';
+
+const task = cron.schedule('0 3 * * 0', runWeeklyBackup, {
+  missedExecutionTolerance: 5 * 60_000, // still run if we wake up to 5 min late
+});
+```
+
+The tolerance is always capped to the gap until the next run, so it can never run the same slot twice. A late run fires once and the next slot is scheduled normally.
+
+> 🛈 **Background tasks** accept two extra options, `executeTimeout` and `startTimeout`, covered in [Background Tasks](/background-tasks#manual-execution-and-executetimeout).
+
+## Next steps
+
+- **[Events & Observability](/event-listening)**: hook into overlap, missed runs, failures, and more.
+- [Logging](/logging): route node-cron's output through your own logger.

@@ -1,10 +1,12 @@
 ---
 outline: deep
+title: Cron Syntax
+description: How node-cron interprets cron expressions, covering fields, allowed values, ranges, steps, lists, named months and weekdays, plus a copy-paste table of common schedules.
 ---
 
 # Cron Syntax
 
-The `node-cron` package uses a standard cron expression format to define when tasks should run. It supports **five or six fields**, though the **first (seconds)** is optional.
+A cron expression is how you tell node-cron *when* a task should run. `node-cron` uses the standard cron format with **five or six fields**, where the leading **seconds** field is optional.
 
 ```plaintext
 # ┌────────────── second (optional)
@@ -17,25 +19,44 @@ The `node-cron` package uses a standard cron expression format to define when ta
 # * * * * * *
 ```
 
-### Allowed Values Per Field
+When you provide **five** fields, the seconds field defaults to `0` (the task runs at the start of the matched minute). Provide **six** fields to schedule down to the second.
 
-| Field        | Value                             |
-|--------------|-----------------------------------|
-| second       | 0-59 (optional)                   |
-| minute       | 0-59                              |
-| hour         | 0-23                              |
-| day of month | 1-31                              |
-| month        | 1-12 (or names, e.g., Jan, Sep)   |
-| day of week  | 0-7 (or names, 0 or 7 are Sunday) |
+## Allowed values per field
 
+| Field          | Values                              |
+| -------------- | ----------------------------------- |
+| second         | `0-59` (optional)                   |
+| minute         | `0-59`                              |
+| hour           | `0-23`                              |
+| day of month   | `1-31`                              |
+| month          | `1-12` (or names, e.g. `Jan`, `Sep`)|
+| day of week    | `0-7` (or names; `0` and `7` are Sunday) |
 
-### Usage Examples
+Each field also accepts `*` (any value), ranges, steps, and comma-separated lists, described below.
 
-### 1. Using Multiple Values
+## Common schedules
 
-You can define multiple specific values using commas. This allows you to run a task at more than one time in a field.
+Copy-paste reference for the expressions you'll reach for most often:
 
-```javascript
+| Expression       | Runs                                  |
+| ---------------- | ------------------------------------- |
+| `* * * * *`      | Every minute                          |
+| `*/5 * * * *`    | Every 5 minutes                       |
+| `0 * * * *`      | Every hour, on the hour               |
+| `0 0 * * *`      | Every day at midnight                 |
+| `0 3 * * *`      | Every day at 03:00                    |
+| `0 9 * * 1-5`    | At 09:00, Monday through Friday       |
+| `0 0 1 * *`      | At midnight on the 1st of each month  |
+| `0 0 * * 0`      | At midnight every Sunday              |
+| `*/30 * * * * *` | Every 30 seconds (6-field form)       |
+
+## Building expressions
+
+### Lists: multiple specific values
+
+Use commas to run a task at several specific values in a field.
+
+```js
 import cron from 'node-cron';
 
 // Runs at minutes 1, 2, 4, and 5 of every hour
@@ -44,50 +65,52 @@ cron.schedule('1,2,4,5 * * * *', () => {
 });
 ```
 
-> **Explanation**: The first field (`minute`) is set to `1,2,4,5`, which means the task runs at those specific minutes past every hour.  
-> **Important**: This expression has only 5 fields, so the **`second`** field is omitted. In `node-cron`, when the seconds field is not provided, it defaults to `0`.
+> This expression has five fields, so the **seconds** field is omitted and defaults to `0`.
 
+### Ranges: a continuous interval
 
-### 2. Using Ranges
-You can define a range using a dash (`-`) to specify a continuous interval.
+Use a dash (`-`) to define an inclusive range.
 
-```javascript
+```js
 import cron from 'node-cron';
 
 // Runs every minute from minute 1 to minute 5 (inclusive) of every hour
 cron.schedule('1-5 * * * *', () => {
   console.log('Running every minute from 1 to 5');
-});e.log('running every minute to 1 from 5');
+});
 ```
-> **Explanation**: This is equivalent to writing `1,2,3,4,5`. It's a cleaner way to express consecutive values.
 
-### 3. Using Step Values
+This is equivalent to `1,2,3,4,5`, a cleaner way to express consecutive values.
 
-Steps are defined using a slash (`/`) after a range or a wildcard. This allows you to define periodic intervals.
+### Steps: periodic intervals
 
-```javascript
-// Runs every 2 minutes (even minutes: 0, 2, 4, ...)
+Use a slash (`/`) after a wildcard or range to define a step.
+
+```js
+import cron from 'node-cron';
+
+// Every 2 minutes (even minutes: 0, 2, 4, ...)
 cron.schedule('*/2 * * * *', () => {
   console.log('Running every 2 minutes (even minutes)');
 });
 
-// Runs every odd minute (1, 3, 5, ..., 59)
+// Every 2 minutes starting from 1 (odd minutes: 1, 3, 5, ...)
 cron.schedule('1-59/2 * * * *', () => {
   console.log('Running every 2 minutes starting from 1 (odd minutes)');
 });
 ```
-> **Explanation**:
->    
-> - `*/2` means “every 2 units”, respecting the available values, e.g: minutes `0-59`. In this case, it means "every 2 minutes from 0 to 59, covering all even minutes.
->
-> - `1-59/2` means “every 2 units starting from 1”, covering all odd minutes.
 
-### 4. Using Month and Weekday Names
+- `*/2` means "every 2 units" across the field's full range (`0-59` for minutes), covering all even minutes.
+- `1-59/2` means "every 2 units starting from 1", covering all odd minutes.
 
-For better readability, `node-cron` lets you use names (full or abbreviated) instead of numbers for months and days of the week.
+### Names: months and weekdays
+
+For readability, use full or abbreviated names instead of numbers for months and days of the week.
 
 ```js
-// Runs every minute on Sundays in January and September
+import cron from 'node-cron';
+
+// Every minute on Sundays in January and September
 cron.schedule('* * * January,September Sunday', () => {
   console.log('Running on Sundays in January and September');
 });
@@ -96,6 +119,24 @@ cron.schedule('* * * January,September Sunday', () => {
 cron.schedule('* * * Jan,Sep Sun', () => {
   console.log('Running on Sundays in Jan and Sep');
 });
-
 ```
-> **Explanation**: Names can improve readability, especially when dealing with specific months or days.
+
+## Validating expressions
+
+Not sure an expression is valid? Check it before scheduling:
+
+```js
+import cron from 'node-cron';
+
+cron.validate('0 12 * * *'); // true
+cron.validate('not a cron'); // false
+```
+
+See [`validate`](/api-reference#validate-expression) in the API reference.
+
+## Next steps
+
+Now that you can describe *when* a task runs, learn how to manage it once it's running:
+
+- **[Task Lifecycle & Status](/task-lifecycle)**: start, stop, inspect, and destroy tasks.
+- [Scheduling Options](/scheduling-options): timezones, overlap prevention, and limits.

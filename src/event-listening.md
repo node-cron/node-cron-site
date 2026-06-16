@@ -1,55 +1,76 @@
-# Event Listening
+---
+outline: deep
+title: Events & Observability
+description: Subscribe to node-cron task lifecycle events (task started/stopped/destroyed and execution started/finished/failed/missed/overlap/maxReached), each carrying a TaskContext.
+---
 
-Scheduled tasks — both basic and background — support lifecycle event subscriptions through the `.on()`, `.once()`, and `.off()` methods.
+# Events & Observability
 
-These events let you react to key moments in a task’s lifecycle, such as when it starts, finishes, fails, or is destroyed. Every listener receives a `TaskContext` object containing detailed metadata about the task and its execution.
+Once a task is running, you'll often want to *know* what it's doing: when it ran, whether it succeeded, how long it took, whether a run was missed. node-cron exposes this through lifecycle events.
 
-## Available Events
-
-| Event                  | Payload       | Description                                                          |
-| ---------------------- | ------------- | -------------------------------------------------------------------- |
-| `task:started`         | `TaskContext` | Emitted when the task is started via `.start()`.                     |
-| `task:stopped`         | `TaskContext` | Emitted when the task is stopped via `.stop()`.                      |
-| `task:destroyed`       | `TaskContext` | Emitted when the task is destroyed via `.destroy()`.                 |
-| `execution:started`    | `TaskContext` | Emitted right before the task callback is executed.                  |
-| `execution:finished`   | `TaskContext` | Emitted after the task successfully finishes.                        |
-| `execution:failed`     | `TaskContext` | Emitted when the task throws an error.                               |
-| `execution:missed`     | `TaskContext` | Emitted when a scheduled execution is missed.                        |
-| `execution:overlap`    | `TaskContext` | Emitted when a scheduled execution is skipped due to an ongoing one. |
-| `execution:maxReached` | `TaskContext` | Emitted when `maxExecutions` is reached. The task is destroyed.      |
-
-
-
-## Example
+Every `ScheduledTask`, whether inline or [background](/background-tasks), supports `.on()`, `.once()`, and `.off()`. Each listener receives a `TaskContext` with metadata about the task and the specific execution.
 
 ```js
-const task = cron.schedule('* * * * *', async (context) => {
-  console.log('Running task at', context.date);
-  return 'done';
-});
+import cron from 'node-cron';
 
-task.on('execution:started', (ctx) => {
-  console.log('Execution started at', ctx.date, 'Reason:', ctx.execution?.reason);
+const task = cron.schedule('* * * * *', async () => {
+  return doWork();
 });
 
 task.on('execution:finished', (ctx) => {
-  console.log('Execution finished. Result:', ctx.execution?.result);
+  console.log(`done in ${ctx.execution?.finishedAt - ctx.execution?.startedAt}ms`);
 });
 
 task.on('execution:failed', (ctx) => {
-  console.error('Execution failed with error:', ctx.execution?.error?.message);
-});
-
-task.on('execution:maxReached', (ctx) => {
-  console.warn(`Task "${ctx.task?.id}" reached max executions.`);
+  console.error('failed:', ctx.execution?.error?.message);
 });
 ```
 
-## TaskContext Payload
+> 💡 Attach listeners **before** the task starts to avoid missing early events. With `cron.schedule` the task starts immediately, so for guaranteed coverage create it stopped with [`cron.createTask`](/task-lifecycle#creating-a-stopped-task), attach listeners, then call `.start()`.
 
-Every event now provides a `TaskContext` object for consistent access to timing and execution metadata.
+## Available events
 
-### Type Definition
+| Event                  | Payload       | Emitted when…                                                    |
+| ---------------------- | ------------- | ---------------------------------------------------------------- |
+| `task:started`         | `TaskContext` | The task is started via `.start()`.                              |
+| `task:stopped`         | `TaskContext` | The task is stopped via `.stop()`.                               |
+| `task:destroyed`       | `TaskContext` | The task is destroyed via `.destroy()`.                          |
+| `execution:started`    | `TaskContext` | Right before the task function runs.                             |
+| `execution:finished`   | `TaskContext` | The task function finishes successfully.                         |
+| `execution:failed`     | `TaskContext` | The task function throws or rejects.                             |
+| `execution:missed`     | `TaskContext` | A scheduled run was missed (blocking I/O or high CPU).           |
+| `execution:overlap`    | `TaskContext` | A run was skipped because a previous one was still going (`noOverlap`). |
+| `execution:maxReached` | `TaskContext` | `maxExecutions` was reached. The task is then destroyed.         |
+
+## Subscribing
+
+```js
+import cron from 'node-cron';
+
+const task = cron.createTask('* * * * *', async (ctx) => {
+  console.log('running at', ctx.dateLocalIso);
+  return 'done';
+});
+
+// React every time
+task.on('execution:finished', (ctx) => {
+  console.log('result:', ctx.execution?.result);
+});
+
+// React just once, then auto-remove
+task.once('task:started', () => console.log('scheduler is up'));
+
+// Stop listening
+const onFail = (ctx) => console.error(ctx.execution?.error);
+task.on('execution:failed', onFail);
+task.off('execution:failed', onFail);
+
+task.start();
+```
+
+## TaskContext
+
+Every event delivers a `TaskContext`, giving consistent access to timing and execution metadata.
 
 ```ts
 export type TaskContext = {
@@ -58,25 +79,22 @@ export type TaskContext = {
   triggeredAt: Date;
   task?: ScheduledTask;
   execution?: Execution;
-}
+};
 ```
 
-#### Field Descriptions
+| Field          | Type             | Description                                                           |
+| -------------- | ---------------- | --------------------------------------------------------------------- |
+| `date`         | `Date`           | The time the run was scheduled for.                                   |
+| `dateLocalIso` | `string`         | Human-readable local timestamp, using the task's timezone.            |
+| `triggeredAt`  | `Date`           | When the event was actually emitted. Useful for spotting drift.       |
+| `task`         | `ScheduledTask?` | The task instance.                                                    |
+| `execution`    | `Execution?`     | Details of the run (present for `execution:*` events).                |
 
-| Field          | Type            | Description                                                               |
-| -------------- | --------------- | ------------------------------------------------------------------------- |
-| `date`         | `Date`          | Timestamp when the task was scheduled to run (or did run).                |
-| `dateLocalIso` | `string`        | Human-readable local timestamp string, using the provided timezone.       |
-| `triggeredAt`  | `Date`          | Actual time the event was emitted. Useful for debugging latency or drift. |
-| `task`         | `ScheduledTask` | Reference to the task instance.                                           |
-| `execution`    | `Execution?`    | Execution info if relevant to the event (null for non-execution events).  |
+### Execution
 
+`TaskContext.execution` describes a single run of the task:
 
-### Execution Type
-
-This structure is embedded in TaskContext.execution and represents a single run of a task:
-
-```js
+```ts
 export type Execution = {
   id: string;
   reason: 'invoked' | 'scheduled';
@@ -84,20 +102,25 @@ export type Execution = {
   finishedAt?: Date;
   error?: Error;
   result?: any;
-}
+};
 ```
-#### Execution Fields
-| Field        | Type     | Description                                                       |
-| ------------ | -------- | ----------------------------------------------------------------- |
-| `id`         | `string` | Unique ID for this execution.                                     |
-| `reason`     | `string` | Why the task was triggered — either `'invoked'` or `'scheduled'`. |
-| `startedAt`  | `Date?`  | Time execution started.                                           |
-| `finishedAt` | `Date?`  | Time execution finished.                                          |
-| `error`      | `Error?` | Error thrown, if any.                                             |
-| `result`     | `any?`   | Return value of the task if successful.                           |
 
+| Field        | Type      | Description                                                        |
+| ------------ | --------- | ----------------------------------------------------------------- |
+| `id`         | `string`  | Unique id for this execution.                                     |
+| `reason`     | `string`  | `'scheduled'` (fired by the schedule) or `'invoked'` (via `execute()`). |
+| `startedAt`  | `Date?`   | When the run started.                                             |
+| `finishedAt` | `Date?`   | When the run finished.                                            |
+| `error`      | `Error?`  | The error, if the run failed.                                     |
+| `result`     | `any?`    | The return value, if the run succeeded.                           |
 
 ## Notes
- - All event listeners receive a `TaskContext`, even for events like task:stopped or execution:missed.
- - Always attach listeners before calling `.start()` to avoid missing early events.
- - Background tasks emit the same events with the same context, relayed from the worker process.
+
+- All listeners receive a `TaskContext`, even for non-execution events like `task:stopped` (where `execution` is absent).
+- **Background tasks** emit the same events with the same context, relayed from the worker process.
+- Listening to `execution:missed` also **suppresses** the default missed-execution warning, since node-cron assumes you're handling it. See [Logging](/logging#suppressing-the-missed-execution-warning).
+
+## Next steps
+
+- **[Background Tasks](/background-tasks)**: run jobs in isolated processes (same events apply).
+- [Logging](/logging): route the warnings and errors behind these events through your own logger.

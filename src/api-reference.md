@@ -16,9 +16,11 @@ Schedules a task to be executed based on a cron expression.
 ```ts
 type Options = {
   name?: string;
-  timezone?: string;       // E.g., "America/New_York"
-  noOverlap?: boolean;     // Prevents overlapping executions
-  maxExecutions?: number;  // Maximum number of times the task should run
+  timezone?: string;              // E.g., "America/New_York"
+  noOverlap?: boolean;            // Prevents overlapping executions
+  maxExecutions?: number;         // Maximum number of times the task should run
+  logger?: Logger;                // Per-task logger (see Logging)
+  suppressMissedWarning?: boolean // Silence the "missed execution" warning
 };
 ```
 
@@ -67,3 +69,23 @@ cron.validate('invalid');    // false
 ```
 
 Returns true if the expression is valid, false otherwise.
+
+## 🔹 `setLogger(logger)`
+
+Replaces the global logger used by node-cron, letting you route internal
+messages (such as the missed-execution warning) through your own logger.
+
+```ts
+import { setLogger } from 'node-cron';
+
+setLogger({
+  info:  (msg) => {},
+  warn:  (msg) => myLogger.warn(msg),
+  error: (msg) => myLogger.error(msg),
+  debug: (msg) => {},
+});
+```
+
+The logger is any object implementing the `Logger` interface (`info`, `warn`,
+`error`, `debug`). See the [Logging guide](/logging) for details, per-task
+loggers, and suppressing the missed-execution warning.

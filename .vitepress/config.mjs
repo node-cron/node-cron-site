@@ -36,6 +36,7 @@ export default {
           { text: 'Scheduling Options', link: '/scheduling-options' },
           { text: 'Task Controls', link: '/task-controls' },
           { text: 'Event Listening', link: '/event-listening' },
+          { text: 'Logging', link: '/logging' },
           { text: 'Background Tasks', link: '/background-tasks' },
           { text: 'Migrationg from V3', link: '/migrating-from-v3' },
          

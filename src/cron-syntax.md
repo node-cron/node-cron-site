@@ -28,7 +28,7 @@ When you provide **five** fields, the seconds field defaults to `0` (the task ru
 | second         | `0-59` (optional)                   |
 | minute         | `0-59`                              |
 | hour           | `0-23`                              |
-| day of month   | `1-31`                              |
+| day of month   | `1-31` (or `L` for the last day)    |
 | month          | `1-12` (or names, e.g. `Jan`, `Sep`)|
 | day of week    | `0-7` (or names; `0` and `7` are Sunday) |
 
@@ -47,6 +47,7 @@ Copy-paste reference for the expressions you'll reach for most often:
 | `0 3 * * *`      | Every day at 03:00                    |
 | `0 9 * * 1-5`    | At 09:00, Monday through Friday       |
 | `0 0 1 * *`      | At midnight on the 1st of each month  |
+| `0 0 L * *`      | At midnight on the last day of each month |
 | `0 0 * * 0`      | At midnight every Sunday              |
 | `*/30 * * * * *` | Every 30 seconds (6-field form)       |
 
@@ -120,6 +121,32 @@ cron.schedule('* * * Jan,Sep Sun', () => {
   console.log('Running on Sundays in Jan and Sep');
 });
 ```
+
+### Last day of the month: `L`
+
+In the **day of month** field, `L` (or lowercase `l`) means the last calendar day of the month. node-cron resolves it per month, so it lands on the 28th, 29th, 30th, or 31st as appropriate, including leap years.
+
+```js
+import cron from 'node-cron';
+
+// Runs at 12:00 on the last day of every month
+cron.schedule('0 0 12 L * *', () => {
+  console.log('Running on the last day of the month');
+});
+```
+
+You can combine `L` with explicit days in a list:
+
+```js
+import cron from 'node-cron';
+
+// Runs at midnight on the 15th and on the last day of every month
+cron.schedule('0 0 15,L * *', () => {
+  console.log('Running on the 15th and the last day');
+});
+```
+
+> `L` is valid **only** in the day of month field. Using it in any other field, or variants such as `LW`, is rejected by [`validate`](#validating-expressions).
 
 ## Validating expressions
 

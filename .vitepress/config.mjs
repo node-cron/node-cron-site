@@ -1,11 +1,16 @@
 import { defineConfig } from 'vitepress'
+import llmstxt from 'vitepress-plugin-llms'
 
 // https://vitepress.dev/reference/site-config
-export default {
+export default defineConfig({
   outDir: './dist',
   srcDir: './src',
   title: "node-cron",
   description: "A Lightweight Task Scheduler for Node.js",
+  sitemap: {
+    hostname: 'https://nodecron.com'
+  },
+  lastUpdated: true,
   head: [
     [
       'script',
@@ -20,25 +25,52 @@ export default {
       gtag('config', 'G-M6MDH0HR0C');`
     ]
   ],
+  vite: {
+    plugins: [llmstxt()]
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Documentation', link: '/getting-started' },
+      { text: 'Quickstart', link: '/getting-started' },
+      { text: 'API Reference', link: '/api-reference' },
     ],
 
     sidebar: [
       {
+        text: 'Get Started',
         items: [
-          { text: 'Getting Started', link: '/getting-started' },
+          { text: 'Introduction', link: '/' },
+          { text: 'Quickstart', link: '/getting-started' },
+        ]
+      },
+      {
+        text: 'Core Concepts',
+        items: [
           { text: 'Cron Syntax', link: '/cron-syntax' },
-          { text: 'Node-Cron Module', link: '/api-reference' },
+          { text: 'Task Lifecycle & Status', link: '/task-lifecycle' },
           { text: 'Scheduling Options', link: '/scheduling-options' },
-          { text: 'Task Controls', link: '/task-controls' },
-          { text: 'Event Listening', link: '/event-listening' },
+        ]
+      },
+      {
+        text: 'Scaling Up',
+        items: [
+          { text: 'Events & Observability', link: '/event-listening' },
           { text: 'Background Tasks', link: '/background-tasks' },
-          { text: 'Migrationg from V3', link: '/migrating-from-v3' },
-         
+          { text: 'Logging', link: '/logging' },
+        ]
+      },
+      {
+        text: 'Recipes',
+        items: [
+          { text: 'Cookbook', link: '/cookbook' },
+        ]
+      },
+      {
+        text: 'Reference',
+        items: [
+          { text: 'API Reference', link: '/api-reference' },
+          { text: 'Migrating from v3', link: '/migrating-from-v3' },
         ]
       }
     ],
@@ -53,4 +85,4 @@ export default {
       copyright: 'Made with 💚 by @merencia'
     }
   }
-}
+})

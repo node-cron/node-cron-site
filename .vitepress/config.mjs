@@ -51,6 +51,7 @@ export default defineConfig({
           { text: 'Cron Syntax', link: '/cron-syntax' },
           { text: 'Task Lifecycle & Status', link: '/task-lifecycle' },
           { text: 'Scheduling Options', link: '/scheduling-options' },
+          { text: 'Timezones & DST', link: '/timezones-and-dst' },
         ]
       },
       {

@@ -15,7 +15,7 @@ This page gets you from zero to a running task in five minutes. By the end you'l
 npm install node-cron
 ```
 
-`node-cron` ships both CommonJS and ESM builds and bundled TypeScript types, so it works out of the box in any modern Node.js project (Node 20.11+).
+`node-cron` ships both CommonJS and ESM builds and bundled TypeScript types, so it works out of the box in any modern Node.js project (Node 20+, tested on 20, 22, and 24).
 
 ## 2. Schedule your first task
 

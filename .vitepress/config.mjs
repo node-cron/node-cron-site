@@ -42,6 +42,7 @@ export default defineConfig({
         items: [
           { text: 'Introduction', link: '/' },
           { text: 'Quickstart', link: '/getting-started' },
+          { text: 'Usage Rules & Limits', link: '/usage-rules' },
         ]
       },
       {

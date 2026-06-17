@@ -24,6 +24,8 @@ export type Options = {
   logger?: Logger;
   suppressMissedWarning?: boolean;
   missedExecutionTolerance?: number;
+  executeTimeout?: number; // background tasks only
+  startTimeout?: number;   // background tasks only
 };
 ```
 

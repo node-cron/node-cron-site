@@ -39,6 +39,8 @@ features:
 
 ## From one line to production
 
+> These docs cover **node-cron v4**.
+
 node-cron is designed to grow with you. The same `schedule` call you write on day one is the one you keep; you just add options as your needs grow.
 
 ```js

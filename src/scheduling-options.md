@@ -32,7 +32,7 @@ export type Options = {
 | Option                  | Type      | Default | Description                                                                 |
 | ----------------------- | --------- | ------- | --------------------------------------------------------------------------- |
 | `name`                  | `string`  | task id | A human-readable identifier for the task. Useful for logging, debugging, and dashboards. |
-| `timezone`              | `string`  | system  | The timezone the cron expression is evaluated in. Any IANA name recognized by `Intl.DateTimeFormat` (e.g. `"America/Sao_Paulo"`, `"UTC"`, `"Europe/London"`). |
+| `timezone`              | `string`  | system  | The timezone the cron expression is evaluated in. Any IANA name recognized by `Intl.DateTimeFormat` (e.g. `"America/Sao_Paulo"`, `"UTC"`, `"Europe/London"`). See [Timezones & DST](/timezones-and-dst) for behavior across daylight-saving transitions. |
 | `noOverlap`             | `boolean` | `false` | If `true`, a scheduled run is **skipped** when the previous run is still executing, preventing overlapping executions. |
 | `maxExecutions`         | `number`  | none    | Maximum number of times the task may run. After the limit, the task is automatically destroyed. |
 | `maxRandomDelay`        | `number`  | `0`     | Adds up to this many milliseconds of random delay (jitter) before each run. Spreads out tasks that would otherwise fire simultaneously. |

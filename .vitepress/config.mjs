@@ -35,6 +35,7 @@ export default defineConfig({
       { text: 'Quickstart', link: '/getting-started' },
       { text: 'NestJS', link: '/nestjs' },
       { text: 'API Reference', link: '/api-reference' },
+      { text: 'Blog', link: '/blog/' },
     ],
 
     sidebar: [

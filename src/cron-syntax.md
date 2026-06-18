@@ -159,7 +159,19 @@ cron.validate('0 12 * * *'); // true
 cron.validate('not a cron'); // false
 ```
 
-See [`validate`](/api-reference#validate-expression) in the API reference.
+For tooling and richer error messages, two more helpers go beyond a boolean:
+
+- [`validateDetailed(expr)`](/api-reference#validatedetailed-expression) returns **every** problem (which field, value, and why) without throwing.
+- [`parse(expr)`](/api-reference#parse-expression) returns the decomposed fields, or throws on the first invalid one.
+
+```js
+import { validateDetailed } from 'node-cron';
+
+validateDetailed('99 12 * * 9').errors;
+// [ { field: 'minute', value: '99', ... }, { field: 'dayOfWeek', value: '9', ... } ]
+```
+
+See [`validate`](/api-reference#validate-expression), [`validateDetailed`](/api-reference#validatedetailed-expression), and [`parse`](/api-reference#parse-expression) in the API reference.
 
 ## Next steps
 

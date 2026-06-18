@@ -125,4 +125,5 @@ When a background task starts, node-cron forks a process and launches a small **
 ## Next steps
 
 - **[Logging](/logging)**: essential for background tasks, since logging happens in the parent.
+- [Distributed Coordination](/distributed-coordination): run a background task on one instance per fire across a fleet.
 - [Cookbook](/cookbook): practical recipes, including a backup job.

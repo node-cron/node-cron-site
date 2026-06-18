@@ -78,6 +78,14 @@ export interface ScheduledTask {
   getStatus(): string;
   getNextRun(): Date | null;
 
+  // Inspection
+  getNextRuns(count: number): Date[];
+  match(date: Date): boolean;
+  msToNext(): number | null;
+  isBusy(): boolean;
+  runsLeft(): number | undefined;
+  getPattern(): string;
+
   on(event: TaskEvent, fn: (context: TaskContext) => void | Promise<void>): void;
   off(event: TaskEvent, fn: (context: TaskContext) => void | Promise<void>): void;
   once(event: TaskEvent, fn: (context: TaskContext) => void | Promise<void>): void;
@@ -151,6 +159,69 @@ import cron from 'node-cron';
 
 const task = cron.schedule('0 * * * *', () => {});
 console.log(task.getNextRun()); // e.g. 2026-06-16T15:00:00.000Z
+```
+
+## Inspecting a task
+
+Beyond status and the next run, a task exposes a few read-only methods for previewing its schedule and seeing what it's doing right now, handy for dashboards, health checks, and tests. They work the same for inline and background tasks.
+
+### `getNextRuns(count)`
+
+Returns the next `count` run times as an array of `Date`s, strictly increasing. Useful for previewing a schedule ("when will this fire next?") without waiting.
+
+```js
+import cron from 'node-cron';
+
+const task = cron.schedule('0 0 12 * * *', () => {});
+task.getNextRuns(3);
+// [ 2026-06-18T12:00:00.000Z, 2026-06-19T12:00:00.000Z, 2026-06-20T12:00:00.000Z ]
+```
+
+A non-positive `count` returns an empty array. Unlike [`getNextRun()`](#getnextrun), this works regardless of the task's state (it computes from the expression).
+
+### `match(date)`
+
+Returns `true` if the given `Date` matches the task's cron expression (evaluated in the task's timezone).
+
+```js
+const task = cron.schedule('0 0 12 * * *', () => {}, { timezone: 'Etc/UTC' });
+task.match(new Date('2026-06-18T12:00:00Z')); // true
+task.match(new Date('2026-06-18T12:00:01Z')); // false
+```
+
+### `msToNext()`
+
+Milliseconds from now until the next run, or `null` when the task is stopped.
+
+```js
+const task = cron.schedule('0 * * * *', () => {});
+task.msToNext(); // e.g. 1830000
+```
+
+### `isBusy()`
+
+`true` while an execution is in progress (the task is in the `running` state), `false` otherwise. Useful before triggering work or shutting down.
+
+```js
+if (!task.isBusy()) await task.execute();
+```
+
+### `runsLeft()`
+
+When [`maxExecutions`](/scheduling-options) is set, the number of runs remaining before the task destroys itself; otherwise `undefined`.
+
+```js
+const task = cron.schedule('* * * * * *', () => {}, { maxExecutions: 3 });
+task.runsLeft(); // 3, then 2, 1, 0
+```
+
+### `getPattern()`
+
+Returns the original cron expression the task was created with.
+
+```js
+const task = cron.schedule('0 0 12 * * *', () => {});
+task.getPattern(); // '0 0 12 * * *'
 ```
 
 ## Creating a stopped task

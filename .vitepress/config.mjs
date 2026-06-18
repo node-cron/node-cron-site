@@ -59,6 +59,7 @@ export default defineConfig({
         items: [
           { text: 'Events & Observability', link: '/event-listening' },
           { text: 'Background Tasks', link: '/background-tasks' },
+          { text: 'Distributed Coordination', link: '/distributed-coordination' },
           { text: 'Logging', link: '/logging' },
         ]
       },

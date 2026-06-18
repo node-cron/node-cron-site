@@ -168,7 +168,7 @@ The instance that *does* run emits the normal [`execution:started` → `executio
 
 ## `distributedLease`
 
-Lease-based coordinators (like a Redis lock) hold the claim for a safety window in case the winner crashes mid-run without releasing it. `distributedLease` (ms, default `30000`) sets that lease, and it **must exceed the task's run time**, or the lease can expire mid-run and another instance could start a second copy. The env-var default ignores it.
+Lease-based coordinators (like a Redis lock) hold the claim for a safety window in case the winner crashes mid-run without releasing it. `distributedLease` (ms, default `30000`) sets that lease, and it **must exceed the task's run time**, or the lease can expire mid-run and a late-arriving instance (delayed by clock skew, GC, or a blocked event loop) could re-acquire the expired key and start a second copy. The env-var default ignores it.
 
 ```js
 cron.schedule('0 3 * * *', runNightlyBackup, {
@@ -177,6 +177,16 @@ cron.schedule('0 3 * * *', runNightlyBackup, {
   distributedLease: 5 * 60_000, // the backup can take up to ~5 minutes
 });
 ```
+
+::: warning Account for jitter
+The lease is acquired at the scheduled time, **before** any [`maxRandomDelay`](/scheduling-options) jitter is applied (the jitter only runs on the instance that won the lock, never affecting which instance wins). So the key stays claimed for `jitter + run time`, not just the run time. When you combine `distributed` with `maxRandomDelay`, size the lease for both:
+
+```
+distributedLease  >  maxRandomDelay + the task's max run time
+```
+
+Otherwise the lease can expire while the winner is still waiting out its jitter or running, reopening the double-run window above.
+:::
 
 ## Clock skew
 

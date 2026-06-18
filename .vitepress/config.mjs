@@ -68,6 +68,7 @@ export default defineConfig({
         text: 'Integrations',
         items: [
           { text: 'NestJS', link: '/nestjs' },
+          { text: 'Fastify', link: '/fastify' },
         ]
       },
       {

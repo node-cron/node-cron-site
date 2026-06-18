@@ -204,6 +204,31 @@ export class SyncController {
 
 For a job that should run on only one instance across a fleet, add `distributed: true` and a coordinator, see the [NestJS guide](/nestjs#distributed-scheduling).
 
+## Fastify: scheduled jobs as a plugin
+
+With [`@node-cron/fastify`](/fastify) you declare jobs when registering the plugin (they start on `onReady`, stop on `onClose`) and can schedule more imperatively from a route via `fastify.scheduler`.
+
+```ts
+import Fastify from 'fastify';
+import { fastifyNodeCron } from '@node-cron/fastify';
+
+const app = Fastify();
+
+await app.register(fastifyNodeCron, {
+  tasks: [
+    { cron: '0 3 * * *', name: 'nightly-backup', run: () => runBackup() },
+  ],
+});
+
+// schedule on demand, and inspect via the decorator
+app.post('/reports/enable', async () => {
+  app.scheduler.schedule('*/5 * * * *', () => sendReport(), { name: 'report' });
+  return { nextRun: app.scheduler.getTaskByName('report')?.getNextRun() };
+});
+
+await app.listen({ port: 3000 });
+```
+
 ## Next steps
 
 - [API Reference](/api-reference): every function in the module.

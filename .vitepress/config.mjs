@@ -33,7 +33,6 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Quickstart', link: '/getting-started' },
-      { text: 'NestJS', link: '/nestjs' },
       { text: 'API Reference', link: '/api-reference' },
       { text: 'Blog', link: '/blog/' },
     ],

@@ -41,6 +41,7 @@ task.on('execution:failed', (ctx) => {
 | `execution:missed`     | `TaskContext` | A scheduled run was missed (blocking I/O or high CPU).           |
 | `execution:overlap`    | `TaskContext` | A run was skipped because a previous one was still going (`noOverlap`). |
 | `execution:maxReached` | `TaskContext` | `maxExecutions` was reached. The task is then destroyed.         |
+| `execution:skipped`    | `TaskContext` | A [`distributed`](/distributed-coordination) run was skipped on this instance. `ctx.reason` is `'not-elected'` (another instance ran it) or `'coordinator-error'` (the coordinator failed; failed closed). |
 
 ## Subscribing
 
@@ -79,6 +80,7 @@ export type TaskContext = {
   triggeredAt: Date;
   task?: ScheduledTask;
   execution?: Execution;
+  reason?: 'not-elected' | 'coordinator-error';
 };
 ```
 
@@ -89,6 +91,7 @@ export type TaskContext = {
 | `triggeredAt`  | `Date`           | When the event was actually emitted. Useful for spotting drift.       |
 | `task`         | `ScheduledTask?` | The task instance.                                                    |
 | `execution`    | `Execution?`     | Details of the run (present for `execution:*` events).                |
+| `reason`       | `string?`        | Why a run was skipped. Present only on [`execution:skipped`](/distributed-coordination#knowing-when-an-instance-skips): `'not-elected'` or `'coordinator-error'`. |
 
 ### Execution
 

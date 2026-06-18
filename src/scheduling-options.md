@@ -24,6 +24,9 @@ export type Options = {
   logger?: Logger;
   suppressMissedWarning?: boolean;
   missedExecutionTolerance?: number;
+  distributed?: boolean;             // run on one instance per fire across a fleet
+  runCoordinator?: RunCoordinator;   // per-task coordinator (overrides the global one)
+  distributedTtl?: number;           // lease ms for lease-based coordinators (default 30000)
   executeTimeout?: number; // background tasks only
   startTimeout?: number;   // background tasks only
 };
@@ -39,6 +42,9 @@ export type Options = {
 | `logger`                | `Logger`  | global  | A custom [logger](/logging) for this task, overriding the global one. **Not supported for [background tasks](/background-tasks).** |
 | `suppressMissedWarning` | `boolean` | `false` | Silences the "missed execution" warning for this task. See [Logging](/logging#suppressing-the-missed-execution-warning). |
 | `missedExecutionTolerance` | `number` | `1000` | How late (in ms) a scheduled run may wake and still execute instead of being reported as missed. Long timers drift (OS sleep, GC, throttling, clock skew), which can otherwise skip daily/weekly runs. Always capped to the gap to the next run, so it can never run a slot twice. |
+| `distributed`           | `boolean` | `false` | Run this task on a **single instance per fire** across a fleet. Requires a `name`. Uses the `NODE_CRON_RUN` env-var default (one designated runner) unless a coordinator is set. See [Distributed Coordination](/distributed-coordination). |
+| `runCoordinator`        | `RunCoordinator` | global | A per-task [run coordinator](/distributed-coordination#high-availability-a-custom-run-coordinator), overriding the one set with `setRunCoordinator`. Only used when `distributed` is `true`. |
+| `distributedTtl`        | `number`  | `30000` | Lease expiry (ms) passed to lease-based coordinators (e.g. a Redis lock) in case the holder crashes mid-run. Must exceed the run time. Ignored by the env-var default. |
 
 > 🛈 There is no `scheduled` or `runOnInit` option anymore. Tasks created with `cron.schedule` start immediately; for a task that starts stopped, use [`cron.createTask`](/task-lifecycle#creating-a-stopped-task). To run a task immediately on demand, call [`task.execute()`](/task-lifecycle#execute). See [Migrating from v3](/migrating-from-v3).
 
@@ -115,6 +121,21 @@ const task = cron.schedule('0 * * * *', () => {
   maxRandomDelay: 30_000, // up to 30s of random delay per run
 });
 ```
+
+### Run on one instance across a fleet
+
+When several copies of your app run the same schedule, `distributed` makes a task fire on only one instance per scheduled time. Out of the box you designate the runner with the `NODE_CRON_RUN` env var; for high availability, register a [run coordinator](/distributed-coordination#high-availability-a-custom-run-coordinator) (e.g. Redis):
+
+```js
+import cron from 'node-cron';
+
+cron.schedule('0 3 * * *', runNightlyBackup, {
+  name: 'nightly-backup', // required: forms the coordination key
+  distributed: true,
+});
+```
+
+A not-elected instance emits [`execution:skipped`](/event-listening) instead of running. See [Distributed Coordination](/distributed-coordination) for the full picture.
 
 ### Name a task
 

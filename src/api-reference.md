@@ -13,9 +13,12 @@ import cron, {
   schedule,
   createTask,
   validate,
+  validateDetailed,
+  parse,
   getTasks,
   getTask,
   setLogger,
+  setRunCoordinator,
 } from 'node-cron';
 ```
 
@@ -45,6 +48,9 @@ type Options = {
   logger?: Logger;                // per-task logger (not for background tasks)
   suppressMissedWarning?: boolean // silence the "missed execution" warning
   missedExecutionTolerance?: number // ms a late run may still execute (default 1000)
+  distributed?: boolean;          // run on one instance per fire across a fleet
+  runCoordinator?: RunCoordinator;// per-task coordinator (overrides the global one)
+  distributedTtl?: number;        // lease ms for lease-based coordinators (default 30000)
 };
 ```
 
@@ -94,6 +100,63 @@ import cron from 'node-cron';
 cron.validate('0 12 * * *'); // true
 cron.validate('invalid');    // false
 ```
+
+## `validateDetailed(expression)`
+
+Like `validate`, but instead of a boolean returns a structured result describing **every** problem (which field, the offending value, and why). Useful for tooling, editors, and richer error messages.
+
+```ts
+type CronFieldError = { field: string; value?: string; message: string };
+type DetailedValidation = {
+  valid: boolean;
+  fields?: ParsedFields;   // present only when valid
+  errors: CronFieldError[];
+};
+```
+
+```js
+import { validateDetailed } from 'node-cron';
+
+validateDetailed('0 12 * * *');
+// { valid: true, errors: [], fields: { second: [0], minute: [0], hour: [12], ... } }
+
+validateDetailed('99 12 * * 9');
+// {
+//   valid: false,
+//   errors: [
+//     { field: 'minute',    value: '99', message: '99 is a invalid expression for minute' },
+//     { field: 'dayOfWeek', value: '9',  message: '9 is a invalid expression for week day' },
+//   ]
+// }
+```
+
+It reports **every** bad field at once (not just the first). See [Cron Syntax](/cron-syntax#validating-expressions).
+
+## `parse(expression)`
+
+Parses a cron expression into its decomposed, expanded fields, or **throws** an `Error` describing the first invalid field.
+
+```ts
+type ParsedFields = {
+  second: number[];
+  minute: number[];
+  hour: number[];
+  dayOfMonth: (number | string)[];
+  month: number[];
+  dayOfWeek: number[];
+};
+```
+
+```js
+import { parse } from 'node-cron';
+
+parse('0 12 * * 1-5');
+// { second: [0], minute: [0], hour: [12], dayOfMonth: [1, …, 31], month: [1, …, 12], dayOfWeek: [1, 2, 3, 4, 5] }
+
+parse('0 99 * * *'); // throws: 99 is a invalid expression for hour
+```
+
+Use `parse` when you want the structured fields (or a thrown error); use [`validate`](#validate-expression) for a boolean and [`validateDetailed`](#validatedetailed-expression) for a non-throwing list of problems.
 
 ## `getTasks()`
 
@@ -151,6 +214,28 @@ setLogger({
 ```
 
 The argument is any object implementing the `Logger` interface (`info`, `warn`, `error`, `debug`). See the [Logging guide](/logging) for the full interface, per-task loggers, winston/pino adapters, and the missed-execution warning.
+
+## `setRunCoordinator(coordinator)`
+
+Sets the process-wide [run coordinator](/distributed-coordination) used by tasks scheduled with `distributed: true`. This is the high-availability path: any instance can run a fire, only one wins. Without it, `distributed` tasks fall back to the `NODE_CRON_RUN` env-var default (a single designated runner).
+
+```js
+import { setRunCoordinator } from 'node-cron';
+import { RedisLockCoordinator } from '@node-cron/redis-coordinator';
+
+setRunCoordinator(new RedisLockCoordinator(redis));
+```
+
+The argument is any object implementing the `RunCoordinator` interface:
+
+```ts
+interface RunCoordinator {
+  shouldRun(key: string, ttlMs: number): boolean | Promise<boolean>;
+  onComplete?(key: string): void | Promise<void>;
+}
+```
+
+Pass `undefined` to clear it. A per-task coordinator can be set via the [`runCoordinator`](/scheduling-options) option. See [Distributed Coordination](/distributed-coordination) for the full guide.
 
 ## Next steps
 

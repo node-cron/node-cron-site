@@ -77,24 +77,57 @@ interface RunCoordinator {
 }
 ```
 
-Register one globally with `setRunCoordinator`, and it's used for every `distributed` task instead of the env-var default:
+Register one globally with `setRunCoordinator` and it's used for every `distributed` task instead of the env-var default. Under the hood a lease-based coordinator turns `shouldRun` into an atomic "claim this key" and `onComplete` into a safe release, so for the fire keyed `nightly-backup:2026-06-17T03:00:00.000Z`, the first instance to claim it wins and the rest get `false`.
+
+### The Redis coordinator
+
+The official Redis implementation ships as a separate package, [`@node-cron/redis-coordinator`](https://www.npmjs.com/package/@node-cron/redis-coordinator), so the core stays dependency-free.
+
+You install it alongside `node-cron` and **the Redis client you already use** (it supports both [`ioredis`](https://github.com/redis/ioredis) and [`node-redis`](https://github.com/redis/node-redis) v4, and auto-detects which one you passed):
+
+::: code-group
+
+```bash [node-redis]
+npm install @node-cron/redis-coordinator node-cron redis
+```
+
+```bash [ioredis]
+npm install @node-cron/redis-coordinator node-cron ioredis
+```
+
+:::
+
+It needs **node-cron >= 4.4.1** (the peer dependency) and has **zero runtime dependencies** of its own: you pass in a client you already created and connected, and the coordinator just uses it (your TLS, Sentinel, Cluster, auth, and retry config stay yours).
 
 ```js
+import { createClient } from 'redis';
 import cron, { setRunCoordinator } from 'node-cron';
 import { RedisLockCoordinator } from '@node-cron/redis-coordinator';
 
+const redis = createClient(); // your client, your connection
+await redis.connect();
+
 setRunCoordinator(new RedisLockCoordinator(redis));
 
+// Deploy on N instances: only one runs each 3am fire, and it survives the loss of any node.
 cron.schedule('0 3 * * *', runNightlyBackup, {
   name: 'nightly-backup',
-  distributed: true, // now HA: any instance can run it, only one wins
+  distributed: true,
+  distributedLease: 5 * 60_000, // the backup can take up to ~5 minutes
 });
 ```
 
-Under the hood a Redis coordinator turns `shouldRun` into an atomic "claim this key" (`SET key NX PX ttl`) and `onComplete` into a safe release, so for the fire keyed `nightly-backup:2026-06-17T03:00:00.000Z`, the first instance to claim it wins and the rest get `false`.
+With `ioredis` it's the same, just hand in the client you have:
 
-::: info `@node-cron/redis-coordinator`
-The Redis-backed coordinator ships as a separate package so the core stays dependency-free. Until then, any object implementing the `RunCoordinator` interface works, the contract above is the whole API.
+```js
+import Redis from 'ioredis';
+setRunCoordinator(new RedisLockCoordinator(new Redis()));
+```
+
+Options: `keyPrefix` (default `node-cron:lock:`), `clientType` (`'auto'` | `'ioredis'` | `'node-redis'`), and a `logger`. It also exposes a `healthCheck()` that compares the local clock to the Redis server clock, see [clock skew](#clock-skew) below.
+
+::: tip Other backends
+`@node-cron/redis-coordinator` is just one implementation of the `RunCoordinator` interface above. Any object with `shouldRun`/`onComplete` works, so you can back coordination with Postgres, etcd, or anything your fleet shares.
 :::
 
 ### Per-task coordinator
@@ -144,6 +177,24 @@ cron.schedule('0 3 * * *', runNightlyBackup, {
   distributedLease: 5 * 60_000, // the backup can take up to ~5 minutes
 });
 ```
+
+## Clock skew
+
+Coordination keys are built from the **scheduled time** (`name:fireTimeISO`), so every instance must agree on what time it is. If two instances' clocks drift apart, they compute different keys for the "same" fire, claim different locks, and both run, the no-concurrent guarantee quietly degrades. Keep your fleet on NTP.
+
+To catch drift before it bites, `@node-cron/redis-coordinator` exposes a `healthCheck()` that compares the local clock to the Redis server clock (a shared reference) and reports the skew:
+
+```js
+const coordinator = new RedisLockCoordinator(redis);
+cron.setRunCoordinator(coordinator);
+
+const { ok, driftMs } = await coordinator.healthCheck(); // default threshold 1000ms
+if (!ok) {
+  console.warn(`clock skew vs Redis is ${driftMs}ms; distributed coordination may be unreliable`);
+}
+```
+
+Run it at startup (or on a health endpoint) to surface a misconfigured clock as an alert rather than a duplicate run.
 
 ## Background tasks work too
 

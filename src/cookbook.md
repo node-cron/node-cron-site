@@ -161,6 +161,49 @@ process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 ```
 
+## NestJS: a scheduled job you can also trigger on demand
+
+With [`@node-cron/nestjs`](/nestjs) you schedule with the familiar decorators and still get node-cron's task API. Here a job runs every 30 seconds, and an endpoint triggers it off-schedule and reports when it's next due, using `SchedulerRegistry`.
+
+```ts
+// tasks.service.ts
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@node-cron/nestjs';
+
+@Injectable()
+export class TasksService {
+  private readonly logger = new Logger(TasksService.name);
+
+  @Cron(CronExpression.EVERY_30_SECONDS, { name: 'sync' })
+  sync() {
+    this.logger.log('syncing…');
+  }
+}
+```
+
+```ts
+// sync.controller.ts
+import { Controller, Post, Get } from '@nestjs/common';
+import { SchedulerRegistry } from '@node-cron/nestjs';
+
+@Controller('sync')
+export class SyncController {
+  constructor(private readonly registry: SchedulerRegistry) {}
+
+  @Post() // run it now, without waiting for the schedule
+  runNow() {
+    return this.registry.getCronJob('sync').execute();
+  }
+
+  @Get('next')
+  next() {
+    return { nextRun: this.registry.getCronJob('sync').getNextRun() };
+  }
+}
+```
+
+For a job that should run on only one instance across a fleet, add `distributed: true` and a coordinator, see the [NestJS guide](/nestjs#distributed-scheduling).
+
 ## Next steps
 
 - [API Reference](/api-reference): every function in the module.

@@ -33,6 +33,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Quickstart', link: '/getting-started' },
+      { text: 'NestJS', link: '/nestjs' },
       { text: 'API Reference', link: '/api-reference' },
     ],
 
@@ -61,6 +62,12 @@ export default defineConfig({
           { text: 'Background Tasks', link: '/background-tasks' },
           { text: 'Distributed Coordination', link: '/distributed-coordination' },
           { text: 'Logging', link: '/logging' },
+        ]
+      },
+      {
+        text: 'Integrations',
+        items: [
+          { text: 'NestJS', link: '/nestjs' },
         ]
       },
       {

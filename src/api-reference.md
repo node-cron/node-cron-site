@@ -50,7 +50,7 @@ type Options = {
   missedExecutionTolerance?: number // ms a late run may still execute (default 1000)
   distributed?: boolean;          // run on one instance per fire across a fleet
   runCoordinator?: RunCoordinator;// per-task coordinator (overrides the global one)
-  distributedTtl?: number;        // lease ms for lease-based coordinators (default 30000)
+  distributedLease?: number;        // lease ms for lease-based coordinators (default 30000)
 };
 ```
 

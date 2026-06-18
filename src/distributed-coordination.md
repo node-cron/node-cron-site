@@ -133,15 +133,15 @@ task.on('execution:skipped', (ctx) => {
 
 The instance that *does* run emits the normal [`execution:started` → `execution:finished`](/event-listening) sequence, so "did this instance run it?" is just "did I get `execution:started`?", no extra event needed.
 
-## `distributedTtl`
+## `distributedLease`
 
-Lease-based coordinators (like a Redis lock) hold the claim for a safety window in case the winner crashes mid-run without releasing it. `distributedTtl` (ms, default `30000`) sets that lease, and it **must exceed the task's run time**, or the lease can expire mid-run and another instance could start a second copy. The env-var default ignores it.
+Lease-based coordinators (like a Redis lock) hold the claim for a safety window in case the winner crashes mid-run without releasing it. `distributedLease` (ms, default `30000`) sets that lease, and it **must exceed the task's run time**, or the lease can expire mid-run and another instance could start a second copy. The env-var default ignores it.
 
 ```js
 cron.schedule('0 3 * * *', runNightlyBackup, {
   name: 'nightly-backup',
   distributed: true,
-  distributedTtl: 5 * 60_000, // the backup can take up to ~5 minutes
+  distributedLease: 5 * 60_000, // the backup can take up to ~5 minutes
 });
 ```
 
@@ -171,4 +171,4 @@ On each fire of a `distributed` task, node-cron builds a key from the task's `na
 
 - **[Events & Observability](/event-listening)**: handle `execution:skipped` and the rest of the lifecycle.
 - [Background Tasks](/background-tasks): run the work in an isolated process; coordination still applies.
-- [Scheduling Options](/scheduling-options): the full list of options, including `distributed`, `runCoordinator`, and `distributedTtl`.
+- [Scheduling Options](/scheduling-options): the full list of options, including `distributed`, `runCoordinator`, and `distributedLease`.

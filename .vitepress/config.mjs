@@ -82,6 +82,7 @@ export default defineConfig({
         items: [
           { text: 'API Reference', link: '/api-reference' },
           { text: 'Migrating from v3', link: '/migrating-from-v3' },
+          { text: 'Migrating from cron', link: '/migrating-from-cron' },
         ]
       }
     ],

@@ -30,7 +30,7 @@ When you provide **five** fields, the seconds field defaults to `0` (the task ru
 | hour           | `0-23`                              |
 | day of month   | `1-31` (or `L` for the last day)    |
 | month          | `1-12` (or names, e.g. `Jan`, `Sep`)|
-| day of week    | `0-7` (or names; `0` and `7` are Sunday) |
+| day of week    | `0-7` (or names; `0` and `7` are Sunday; [`2#3`](#nth-weekday), [`5L`](#last-weekday-of-the-month-weekdayl)) |
 
 Each field also accepts `*` (any value), ranges, steps, and comma-separated lists, described below.
 
@@ -49,6 +49,8 @@ Copy-paste reference for the expressions you'll reach for most often:
 | `0 0 1 * *`      | At midnight on the 1st of each month  |
 | `0 0 L * *`      | At midnight on the last day of each month |
 | `0 0 * * 0`      | At midnight every Sunday              |
+| `0 0 12 * * 1#1` | At 12:00 on the first Monday of every month |
+| `0 0 18 * * 5L`  | At 18:00 on the last Friday of every month  |
 | `*/30 * * * * *` | Every 30 seconds (6-field form)       |
 
 ## Building expressions
@@ -146,7 +148,47 @@ cron.schedule('0 0 15,L * *', () => {
 });
 ```
 
-> `L` is valid **only** in the day of month field. Using it in any other field, or variants such as `LW`, is rejected by [`validate`](#validating-expressions).
+> Bare `L` is valid **only** in the day of month field. In the day of week field, use the `<weekday>L` form described below.
+
+### Nth weekday: `#` {#nth-weekday}
+
+In the **day of week** field, `<weekday>#<nth>` matches the nth occurrence of that weekday in the month. The weekday is `0-7` (Sunday through Saturday, where `0` and `7` are both Sunday), and the occurrence is `1-5`.
+
+```js
+import cron from 'node-cron';
+
+// Runs at 12:00 on the first Monday of every month
+cron.schedule('0 12 * * 1#1', () => {
+  console.log('First Monday of the month');
+});
+
+// Runs at 09:00 on the 3rd Tuesday of every month
+cron.schedule('0 9 * * 2#3', () => {
+  console.log('Third Tuesday of the month');
+});
+```
+
+If the nth occurrence does not exist in a given month (e.g. `0#5` in a month with only four Sundays), that month is simply skipped.
+
+### Last weekday of the month: `<weekday>L` {#last-weekday-of-the-month-weekdayl}
+
+In the **day of week** field, `<weekday>L` matches the last occurrence of that weekday in the month.
+
+```js
+import cron from 'node-cron';
+
+// Runs at 18:00 on the last Friday of every month
+cron.schedule('0 18 * * 5L', () => {
+  console.log('Last Friday of the month');
+});
+
+// Runs at midnight on the last Sunday of every month
+cron.schedule('0 0 * * 0L', () => {
+  console.log('Last Sunday of the month');
+});
+```
+
+> Invalid forms like `8#1`, `2#6`, `2#0`, `8L`, `L5`, or bare `L` in the weekday field are rejected by [`validate`](#validating-expressions).
 
 ## Validating expressions
 

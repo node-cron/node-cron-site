@@ -85,6 +85,7 @@ export interface ScheduledTask {
   isBusy(): boolean;
   runsLeft(): number | undefined;
   getPattern(): string;
+  lastRun(): LastRun | null;
 
   on(event: TaskEvent, fn: (context: TaskContext) => void | Promise<void>): void;
   off(event: TaskEvent, fn: (context: TaskContext) => void | Promise<void>): void;
@@ -223,6 +224,33 @@ Returns the original cron expression the task was created with.
 const task = cron.schedule('0 0 12 * * *', () => {});
 task.getPattern(); // '0 0 12 * * *'
 ```
+
+### `lastRun()`
+
+Returns information about the last actual execution, or `null` if the task has not run yet.
+
+```js
+const task = cron.schedule('* * * * *', async () => {
+  return fetchData();
+});
+
+// Before any execution
+task.lastRun(); // null
+
+// After a successful run
+task.lastRun(); // { date: Date, result: ... }
+
+// After a failed run
+task.lastRun(); // { date: Date, error: Error }
+```
+
+The `date` reflects when the execution actually ran (finish time), not when the scheduler tick was checked. The return type is:
+
+```ts
+type LastRun = { date: Date; result?: unknown; error?: Error };
+```
+
+`LastRun` is exported from the package for TypeScript users.
 
 ## Creating a stopped task
 

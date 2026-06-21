@@ -83,9 +83,13 @@ task.on('execution:failed', (ctx) => {
 - Running heavy jobs in isolated background processes
 - Runtime control: start, stop, inspect, and observe tasks programmatically
 
+::: tip Need more than cron?
+Check out [**Sidequest.js**](https://sidequestjs.com), a distributed job runner for Node.js inspired by Oban and Sidekiq. Retries, priorities, schedules, uniqueness, and a web dashboard. Works with Postgres, MySQL, SQLite and MongoDB.
+:::
+
 ## When to consider something else
 
-- **Durable job queues with retries and priorities**: use [BullMQ](https://bullmq.io), [Agenda](https://github.com/agenda/agenda), or [Sidequest](https://sidequestjs.com)
+- **Durable job queues with retries and priorities**: use [Sidequest](https://sidequestjs.com), [BullMQ](https://bullmq.io), or [Agenda](https://github.com/agenda/agenda)
 - **Persistent workflow orchestration**: use [Temporal](https://temporal.io) or [Inngest](https://inngest.com)
 - **Exactly-once guarantees across crashes**: node-cron coordinates but does not persist state to a database; a queue or workflow engine is a better fit
 

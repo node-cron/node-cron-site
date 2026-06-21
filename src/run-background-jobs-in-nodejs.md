@@ -19,12 +19,6 @@ main thread: ──── cron fires ──── heavy job (3s) ──── bl
                                   ↑ WebSocket pings time out
 ```
 
-Common symptoms:
-- HTTP requests timing out during scheduled jobs
-- Missed cron executions reported in logs
-- Health check failures triggering pod restarts
-- Degraded response times on a predictable schedule
-
 ## The solution: background tasks
 
 node-cron can run any scheduled job in an isolated forked process. Pass a **file path** instead of a function, and the job runs in its own process, completely isolated from your main event loop:

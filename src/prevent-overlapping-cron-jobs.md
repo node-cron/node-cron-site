@@ -18,12 +18,6 @@ minute 2:               task starts (overlap!) ──────────
 minute 3:                              task starts (overlap!) ───
 ```
 
-Common symptoms:
-- Duplicate database writes
-- Double-sent emails or notifications
-- API rate limits exceeded
-- Resource exhaustion from piled-up processes
-
 ## The solution: `noOverlap`
 
 node-cron has built-in overlap prevention. Set `noOverlap: true` and a tick that fires while the previous run is still active is skipped instead of stacked:

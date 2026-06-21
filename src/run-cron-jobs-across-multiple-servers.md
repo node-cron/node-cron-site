@@ -18,12 +18,6 @@ instance B: 0 3 * * * → runs backup (duplicate)
 instance C: 0 3 * * * → runs backup (duplicate)
 ```
 
-Common symptoms:
-- Duplicate database operations
-- Triple API calls against rate-limited services
-- Conflicting writes from concurrent backups
-- Wasted compute across the fleet
-
 ## The solution: `distributed: true`
 
 node-cron has built-in distributed coordination. Set `distributed: true` and only one instance executes each scheduled fire:

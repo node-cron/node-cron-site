@@ -6,7 +6,7 @@ export default defineConfig({
   outDir: './dist',
   srcDir: './src',
   title: "node-cron",
-  description: "A Lightweight Task Scheduler for Node.js",
+  description: "Job Scheduling for Node.js",
   sitemap: {
     hostname: 'https://nodecron.com'
   },
@@ -75,6 +75,14 @@ export default defineConfig({
         text: 'Recipes',
         items: [
           { text: 'Cookbook', link: '/cookbook' },
+        ]
+      },
+      {
+        text: 'Common Problems',
+        items: [
+          { text: 'Prevent Overlapping Cron Jobs', link: '/prevent-overlapping-cron-jobs' },
+          { text: 'Cron Jobs Across Multiple Servers', link: '/run-cron-jobs-across-multiple-servers' },
+          { text: 'Background Jobs in Node.js', link: '/run-background-jobs-in-nodejs' },
         ]
       },
       {

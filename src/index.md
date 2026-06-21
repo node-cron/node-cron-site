@@ -2,7 +2,7 @@
 # https://vitepress.dev/reference/default-theme-home-page
 layout: home
 title: "node-cron: Job Scheduling for Node.js"
-description: Schedule recurring tasks, prevent overlapping runs, coordinate across instances, and run heavy jobs in background processes. Zero dependencies, written in TypeScript.
+description: Job scheduling for Node.js with overlap prevention, distributed coordination, and background tasks. Zero dependencies, written in TypeScript.
 
 hero:
   name: "Node-Cron"

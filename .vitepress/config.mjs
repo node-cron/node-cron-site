@@ -65,10 +65,11 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Integrations',
+        text: 'Ecosystem',
         items: [
           { text: 'NestJS', link: '/nestjs' },
           { text: 'Fastify', link: '/fastify' },
+          { text: 'Plain English to Cron', link: '/cron-translate' },
         ]
       },
       {

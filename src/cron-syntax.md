@@ -21,6 +21,10 @@ A cron expression is how you tell node-cron *when* a task should run. `node-cron
 
 When you provide **five** fields, the seconds field defaults to `0` (the task runs at the start of the matched minute). Provide **six** fields to schedule down to the second.
 
+::: tip Prefer plain English?
+[`cron-translate`](/cron-translate) turns phrases like `every weekday at 6pm` into cron expressions (and back), so you can write `cron.schedule(toCron('every weekday at 6pm'), ...)` without hand-counting fields.
+:::
+
 ## Allowed values per field
 
 | Field          | Values                              |

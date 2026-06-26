@@ -8,16 +8,16 @@
 {{- if .Sponsors }}
 <div class="sp-list" align="center">
 {{- with index .ByTier "gold" }}
-<p><strong>Gold</strong><br/>{{ range . }} <a href="{{ .Website }}" target="_blank" rel="noopener sponsored"><img src="{{ .LogoWithSize 120 }}" alt="{{ .Name }}" height="80"/></a>{{ end }}</p>
+<p><strong>Gold</strong>{{ range . }} <a href="{{ .Website }}" target="_blank" rel="noopener sponsored"><img src="{{ .LogoWithSize 130 }}" alt="{{ .Name }}" style="height:88px;width:auto"/></a>{{ end }}</p>
 {{- end }}
 {{- with index .ByTier "silver" }}
-<p><strong>Silver</strong><br/>{{ range . }} <a href="{{ .Website }}" target="_blank" rel="noopener sponsored"><img src="{{ .LogoWithSize 96 }}" alt="{{ .Name }}" height="60"/></a>{{ end }}</p>
+<p><strong>Silver</strong>{{ range . }} <a href="{{ .Website }}" target="_blank" rel="noopener sponsored"><img src="{{ .LogoWithSize 84 }}" alt="{{ .Name }}" style="height:54px;width:auto"/></a>{{ end }}</p>
 {{- end }}
 {{- with index .ByTier "bronze" }}
-<p><strong>Bronze</strong><br/>{{ range . }} <a href="{{ .Website }}" target="_blank" rel="noopener sponsored"><img src="{{ .LogoWithSize 72 }}" alt="{{ .Name }}" height="44"/></a>{{ end }}</p>
+<p><strong>Bronze</strong>{{ range . }} <a href="{{ .Website }}" target="_blank" rel="noopener sponsored"><img src="{{ .LogoWithSize 56 }}" alt="{{ .Name }}" style="height:36px;width:auto"/></a>{{ end }}</p>
 {{- end }}
 {{- with index .ByTier "backer" }}
-<p><strong>Backers</strong><br/>{{ range . }}<a href="{{ .Website }}">{{ .Name }}</a> &nbsp;{{ end }}</p>
+<p><strong>Backers</strong>{{ range . }}<a href="{{ .Website }}">{{ .Name }}</a> &nbsp;{{ end }}</p>
 {{- end }}
 </div>
 {{- else }}

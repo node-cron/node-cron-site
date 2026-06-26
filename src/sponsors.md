@@ -78,6 +78,28 @@ aside: false
   border: 1px solid var(--vp-c-brand-1);
 }
 .sp-btn.ghost:hover { background: var(--vp-c-brand-soft); }
+.sp-panel {
+  border: 1px solid var(--vp-c-brand-1);
+  border-radius: 16px;
+  background: var(--vp-c-bg-soft);
+  padding: 30px 24px;
+  margin: 22px 0;
+  text-align: center;
+}
+.sp-list p { margin: 28px 0; }
+.sp-list p:first-child { margin-top: 0; }
+.sp-list p:last-child { margin-bottom: 0; }
+.sp-list strong {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--vp-c-text-2);
+  margin-bottom: 6px;
+}
+.sp-list img { border-radius: 10px; margin: 8px; vertical-align: middle; transition: transform .15s ease; }
+.sp-list a:hover img { transform: translateY(-3px); }
+.sp-panel .sp-showcase { border: none; margin: 0; padding: 6px; font-size: 15px; }
 </style>
 
 # Help keep node-cron dependable.
@@ -102,6 +124,16 @@ If it is part of your stack, sponsoring is a simple way to help keep it that way
   <div class="sp-stat"><div class="num">0</div><div class="lbl">runtime<br>dependencies</div></div>
 </div>
 
+## Our sponsors
+
+<div class="sp-panel">
+<!-- sponsors:begin -->
+<div class="sp-showcase">
+  node-cron doesn't have sponsors yet. Yours could be the first logo here.
+</div>
+<!-- sponsors:end -->
+</div>
+
 ## What your sponsorship funds
 
 <div class="sp-funds">
@@ -122,14 +154,6 @@ If it is part of your stack, sponsoring is a simple way to help keep it that way
     <p>Move a CPU-bound or long-running job into an isolated forked process with a single line, and it never blocks your main event loop, while keeping the same lifecycle and events across the process boundary.</p>
   </div>
 </div>
-
-## Our sponsors
-
-<!-- sponsors:begin -->
-<div class="sp-showcase">
-  node-cron doesn't have sponsors yet. Yours could be the first logo here.
-</div>
-<!-- sponsors:end -->
 
 ## Tiers
 

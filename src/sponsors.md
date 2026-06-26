@@ -128,9 +128,11 @@ If it is part of your stack, sponsoring is a simple way to help keep it that way
 
 <div class="sp-panel">
 <!-- sponsors:begin -->
-<div class="sp-showcase">
-  node-cron doesn't have sponsors yet. Yours could be the first logo here.
+<!-- auto-generated from sponsors.tpl.md by @goreleaser/sponsors, do not edit by hand -->
+<div class="sp-list" align="center">
+<p><strong>Silver</strong> <a href="https://easysaas.at" target="_blank" rel="noopener sponsored"><img src="https://avatars.githubusercontent.com/u/24415042?s=84&v=4" alt="easySAAS" style="height:54px;width:auto"/></a></p>
 </div>
+
 <!-- sponsors:end -->
 </div>
 

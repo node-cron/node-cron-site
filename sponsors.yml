@@ -1,0 +1,19 @@
+# Config for @goreleaser/sponsors (used by .github/workflows/sponsors.yml).
+# Reads the same GitHub Sponsors / Open Collective data as the main repo and
+# renders it into src/sponsors.md between the sponsors markers.
+github_user: node-cron
+opencollective_slug: node-cron
+
+tiers:
+  - id: gold
+    name: Gold
+    monthly_rate: 50
+  - id: silver
+    name: Silver
+    monthly_rate: 25
+  - id: bronze
+    name: Bronze
+    monthly_rate: 10
+  - id: backer
+    name: Backer
+    monthly_rate: 5

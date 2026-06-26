@@ -125,11 +125,11 @@ If it is part of your stack, sponsoring is a simple way to help keep it that way
 
 ## Our sponsors
 
-<!-- sponsors -->
+<!-- sponsors:begin -->
 <div class="sp-showcase">
   node-cron doesn't have sponsors yet. Yours could be the first logo here.
 </div>
-<!-- sponsors -->
+<!-- sponsors:end -->
 
 ## Tiers
 

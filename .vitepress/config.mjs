@@ -33,6 +33,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Quickstart', link: '/getting-started' },
+      { text: 'Cron Tester', link: '/cron-tester' },
       { text: 'API Reference', link: '/api-reference' },
       { text: 'Blog', link: '/blog/' },
       { text: 'Sponsor', link: '/sponsors' },
@@ -71,6 +72,7 @@ export default defineConfig({
           { text: 'NestJS', link: '/nestjs' },
           { text: 'Fastify', link: '/fastify' },
           { text: 'Plain English to Cron', link: '/cron-translate' },
+          { text: 'Cron Expression Tester', link: '/cron-tester' },
         ]
       },
       {
